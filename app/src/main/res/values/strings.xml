@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">ChemHelper</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">ChemHelper</string>
+    <string name="nav_header_subtitle"></string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+    <string name="compound_search_hint">Search for a compound</string>
+    <string name="compound_search_label">ChemHelper</string>
+
+    <string name="compound_name"><u>- Compound name</u></string>
+
+    <string-array name="amount_units">
+        <item>kg</item>
+        <item>L</item>
+        <item>mol</item>
+    </string-array>
+
+    <string-array name="concentration_units">
+        <item>Pure</item>
+        <item>wt%</item>
+        <item>vol%</item>
+        <item>mol%</item>
+        <item>M</item>
+        <item>kg/L</item>
+        <item>b</item>
+    </string-array>
+</resources>
