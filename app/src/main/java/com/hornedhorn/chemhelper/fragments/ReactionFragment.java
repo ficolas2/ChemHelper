@@ -58,7 +58,7 @@ public class ReactionFragment extends CompoundReciverFragment {
         view.findViewById(R.id.reaction_add_reactant).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.setCompoundSearchFragment(ReactionFragment.this, false);
+                activity.setCompoundSearchFragment(ReactionFragment.this);
                 receivingReactant = true;
             }
         } );
@@ -66,7 +66,7 @@ public class ReactionFragment extends CompoundReciverFragment {
         view.findViewById(R.id.reaction_add_product).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.setCompoundSearchFragment(ReactionFragment.this, false);
+                activity.setCompoundSearchFragment(ReactionFragment.this);
                 receivingReactant = false;
             }
         } );

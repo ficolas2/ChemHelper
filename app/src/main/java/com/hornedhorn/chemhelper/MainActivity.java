@@ -28,6 +28,11 @@ import com.hornedhorn.chemhelper.fragments.TableFragment;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private Toolbar toolbar;
+
+    private Fragment currentFragment;
+
+    private MainFragment mainFragment;
     private CompoundFragment compoundFragment;
     private ReactionFragment reactionFragment;
     private TableFragment tableFragment;
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -50,13 +55,15 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        setContentFragment( new MainFragment(), false );
-
+        mainFragment = new MainFragment();
         compoundFragment = new CompoundFragment();
         reactionFragment = new ReactionFragment();
         tableFragment = new TableFragment();
         infoFragment = new InfoFragment();
         newCompoundFragment = new NewCompoundFragment();
+
+        setContentFragment( mainFragment, false );
+
     }
 
     @Override
@@ -67,10 +74,13 @@ public class MainActivity extends AppCompatActivity
         } else {
             int count = getSupportFragmentManager().getBackStackEntryCount();
 
-            if (count == 0) {
+            if (count != 0) {
+                back();
+            }else if (currentFragment != mainFragment) {
+                toolbar.setTitle("ChemHelper");
+                setContentFragment(mainFragment, false);
+            }else {
                 super.onBackPressed();
-            } else {
-               back();
             }
         }
     }
@@ -107,31 +117,15 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        Fragment fragment = null;
-        Toolbar toolbar = findViewById(R.id.toolbar);
-
-        if (id == R.id.nav_solutions) {
-            fragment = reactionFragment;
-            toolbar.setTitle("Reaction");
-        } else if (id == R.id.nav_compounds) {
-            fragment = compoundFragment;
-            compoundFragment.setReceiverFragment(infoFragment, true);
-            toolbar.setTitle("Compounds");
+        if (id == R.id.nav_solutions)
+            setReactionFragment();
+        else if (id == R.id.nav_compounds) {
+            setCompoundSearchFragment();
         } else if (id == R.id.nav_periodicTable) {
-            fragment = tableFragment;
-            toolbar.setTitle("Periodic table");
-        } /*else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }*/
-        if (fragment!=null){
-            setContentFragment(fragment, false);
+            setTableFragment();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -146,6 +140,7 @@ public class MainActivity extends AppCompatActivity
         else
             getSupportFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         transaction.commit();
+        currentFragment = fragment;
     }
 
 
@@ -157,9 +152,26 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void setCompoundSearchFragment(CompoundReciverFragment compoundReciver, boolean back){
-        compoundFragment.setReceiverFragment(compoundReciver, back);
-        setContentFragment(compoundFragment, true);
+    public void setTableFragment(){
+        setContentFragment(tableFragment, false);
+        toolbar.setTitle("Periodic table");
+    }
+
+    public void setReactionFragment(){
+        toolbar.setTitle("Reaction");
+        setContentFragment(reactionFragment, false);
+    }
+
+    public void setCompoundSearchFragment(){
+        setCompoundSearchFragment(infoFragment);
+    }
+
+    public void setCompoundSearchFragment(CompoundReciverFragment compoundReceiver){
+        boolean info = compoundReceiver == infoFragment;
+        if (info)
+            toolbar.setTitle("Compounds");
+        compoundFragment.setReceiverFragment(compoundReceiver, info);
+        setContentFragment(compoundFragment, !info);
 
     }
 
