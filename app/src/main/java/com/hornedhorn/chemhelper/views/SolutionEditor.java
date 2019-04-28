@@ -167,6 +167,13 @@ public class SolutionEditor extends RelativeLayout {
             }
         });
 
+        findViewById(R.id.solution_delete).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reactionFragment.deleteCurrentSolution();
+            }
+        });
+
         pureDensityLayout = findViewById(R.id.solution_pure_density_layout);
     }
 

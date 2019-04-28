@@ -18,8 +18,21 @@
             android:id="@+id/reaction_clear"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="5dp"
             android:text="Clear" />
+
+        <TextView
+            android:id="@+id/reaction_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:freezesText="false"
+            android:gravity="center"
+            android:minHeight="30dp"
+            app:autoSizeMaxTextSize="20dp"
+            app:autoSizeMinTextSize="12dp"
+            app:autoSizeStepGranularity="1dp"
+            app:autoSizeTextType="uniform" />
 
         <HorizontalScrollView
             android:id="@+id/reaction_scroll"

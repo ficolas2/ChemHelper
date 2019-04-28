@@ -13,6 +13,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.MainActivity;
 import com.hornedhorn.chemhelper.R;
@@ -44,16 +45,19 @@ public class ReactionFragment extends CompoundReciverFragment {
 
     private ReactionSolutionView currentSolutionView;
 
+    private TextView reactionText;
+
     private Amount auxAmount = new Amount();
 
-
-
-    @Nullable
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.content_reaction, container, false);
+        return inflater.inflate(R.layout.content_reaction, container, false);
+    }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         final MainActivity activity = (MainActivity)getActivity();
+
+        reactionText = view.findViewById(R.id.reaction_text);
 
         view.findViewById(R.id.reaction_add_reactant).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,24 +104,6 @@ public class ReactionFragment extends CompoundReciverFragment {
         reactantsLayout = view.findViewById(R.id.reaction_reactants);
         productsLayout = view.findViewById(R.id.reaction_products);
 
-        for (ReactionSolution solution : reactants){
-            ReactionSolutionView solutionView = new ReactionSolutionView(getContext(), solution, this);
-            reactantsLayout.addView(solutionView);
-            reactantViews.add(solutionView);
-            reactantSolutionViews.add(solutionView);
-
-            ((LinearLayout.LayoutParams)solutionView.getLayoutParams()).gravity = Gravity.CENTER;
-        }
-
-        for (ReactionSolution solution : products){
-            ReactionSolutionView solutionView = new ReactionSolutionView(getContext(), solution, this);
-            productsLayout.addView(solutionView);
-            productViews.add(solutionView);
-            reactantSolutionViews.add(solutionView);
-
-            ((LinearLayout.LayoutParams)solutionView.getLayoutParams()).gravity = Gravity.CENTER;
-        }
-
         final HorizontalScrollView scroll = view.findViewById(R.id.reaction_scroll);
         ViewTreeObserver observer = scroll.getViewTreeObserver();
         observer.addOnGlobalLayoutListener(
@@ -131,16 +117,12 @@ public class ReactionFragment extends CompoundReciverFragment {
                     }
                 });
 
-        updateSolutionViews();
-
         solutionEditor = view.findViewById(R.id.solution_editor);
         solutionEditor.setReactionFragment( this );
 
-        if ( reactants.size() == 0 && products.size() == 0 ){
-            clearViewEmpty(view);
-        }
+        addSolutionViews();
 
-        return view;
+        super.onViewCreated(view, savedInstanceState);
     }
 
     private double getEquivalent(ReactionSolution solution){
@@ -165,6 +147,55 @@ public class ReactionFragment extends CompoundReciverFragment {
         return equivalent;
     }
 
+    private void addSolutionViews(){
+        if ( reactants.size() == 0 && products.size() == 0 ){
+            clearViewEmpty();
+            reactionText.setVisibility(View.GONE);
+            return;
+        }
+
+        String reactionString = "";
+
+        boolean first = true;
+
+        for (ReactionSolution solution : reactants){
+            ReactionSolutionView solutionView = new ReactionSolutionView(getContext(), solution, this);
+            reactantsLayout.addView(solutionView);
+            reactantViews.add(solutionView);
+            reactantSolutionViews.add(solutionView);
+
+            ((LinearLayout.LayoutParams)solutionView.getLayoutParams()).gravity = Gravity.CENTER;
+
+            if (!first)
+                reactionString += " + ";
+            first = false;
+            reactionString += solution.compound.getFormulaString();
+        }
+
+        reactionString += " -> ";
+
+        first = true;
+
+        for (ReactionSolution solution : products){
+            ReactionSolutionView solutionView = new ReactionSolutionView(getContext(), solution, this);
+            productsLayout.addView(solutionView);
+            productViews.add(solutionView);
+            reactantSolutionViews.add(solutionView);
+
+            ((LinearLayout.LayoutParams)solutionView.getLayoutParams()).gravity = Gravity.CENTER;
+
+            if (!first)
+                reactionString += " + ";
+            first = false;
+            reactionString += solution.compound.getFormulaString();
+        }
+
+        reactionText.setText(reactionString);
+
+        updateSolutionViews();
+
+    }
+
     public void updateSolutionViews(){
         double reactantsEq = getEquivalent(reactants);
         double productsEq = getEquivalent(products);
@@ -187,15 +218,16 @@ public class ReactionFragment extends CompoundReciverFragment {
     private void clearViews(){
         reactantsLayout.removeAllViews();
         productsLayout.removeAllViews();
-        clearViewEmpty(getView());
+        clearViewEmpty();
     }
 
-    private void clearViewEmpty(View view){
+    private void clearViewEmpty(){
+        View view = getView();
         LinearLayout linearLayout = view.findViewById(R.id.reaction_linear_layout);
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) linearLayout.getLayoutParams();
         params.gravity = Gravity.CENTER;
 
-        view.findViewById(R.id.reaction_clear).setVisibility(View.INVISIBLE);
+        view.findViewById(R.id.reaction_clear).setVisibility(View.GONE);
         solutionEditor.setVisibility(View.GONE);
     }
 
@@ -271,5 +303,15 @@ public class ReactionFragment extends CompoundReciverFragment {
 
     public ReactionSolutionView getCurrentSolutionView() {
         return currentSolutionView;
+    }
+
+    public void deleteCurrentSolution() {
+        solutions.remove(currentSolutionView.solution);
+        products.remove(currentSolutionView.solution);
+        reactants.remove(currentSolutionView.solution);
+        clearViews();
+        addSolutionViews();
+        currentSolutionView = null;
+        solutionEditor.setVisibility(View.GONE);
     }
 }
