@@ -53,47 +53,61 @@
                 android:text="C2H5OH"
                 android:textSize="20sp" />
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorPrimary" />
-
-            <TextView
-                android:id="@+id/textView6"
+            <LinearLayout
+                android:id="@+id/info_melting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Melting point"
-                android:textSize="20sp" />
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/info_melting_point"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
-                android:text="10ºC"
-                android:textSize="20sp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorPrimary" />
 
-            <View
-                android:id="@+id/view"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/colorPrimary" />
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Melting point:"
+                    android:textSize="20sp" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Boiling point"
-                android:textSize="20sp" />
+                <TextView
+                    android:id="@+id/info_melting_point"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="10ºC"
+                    android:textSize="20sp" />
+            </LinearLayout>
 
-            <TextView
-                android:id="@+id/info_boiling_point"
+            <LinearLayout
+                android:id="@+id/info_boiling"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginStart="10dp"
-                android:text="96ºC"
-                android:textSize="20sp" />
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/view"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorPrimary" />
+
+                <TextView
+                    android:id="@+id/info_boiling_point"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:text="96ºC"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Boiling point:"
+                    android:textSize="20sp" />
+            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"

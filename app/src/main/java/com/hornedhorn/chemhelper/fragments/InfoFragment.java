@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.R;
@@ -34,9 +35,13 @@ public class InfoFragment extends CompoundReciverFragment {
         TextView formulaView = view.findViewById(R.id.info_formula);
         formulaView.setText(compound.getFormulaString());
 
+        LinearLayout meltingLayout = view.findViewById(R.id.info_melting);
+        meltingLayout.setVisibility(compound.meltingPoint == null ? View.GONE:View.VISIBLE);
         TextView meltingView = view.findViewById(R.id.info_melting_point);
         meltingView.setText(compound.getMeltingPointString());
 
+        LinearLayout boilingLayout = view.findViewById(R.id.info_boiling);
+        boilingLayout.setVisibility(compound.boilingPoint == null ? View.GONE:View.VISIBLE);
         TextView boilingView = view.findViewById(R.id.info_boiling_point);
         boilingView.setText(compound.getBoilingPointString());
     }

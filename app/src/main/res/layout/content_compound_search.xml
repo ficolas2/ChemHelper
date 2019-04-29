@@ -12,6 +12,12 @@
         android:layout_margin="16dp"
         android:orientation="vertical">
 
+        <Button
+            android:id="@+id/compound_new"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="New compound" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -75,12 +81,6 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="top" />
         </ScrollView>
-
-        <Button
-            android:id="@+id/compound_new"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="New compound" />
 
     </LinearLayout>
 
