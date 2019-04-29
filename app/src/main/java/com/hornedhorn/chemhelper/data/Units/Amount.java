@@ -4,12 +4,6 @@ import android.util.Log;
 
 public class Amount {
 
-    public void setFromSI(double value, UnitType fromUnitType) {
-        UnitType currentUnitType = unitType;
-        setSI(value, fromUnitType);
-        setSI(getSI(currentUnitType), currentUnitType);
-    }
-
     public enum UnitType {
         MASS("kg"), VOLUME("L"), MOLE("mol");
 
@@ -72,12 +66,19 @@ public class Amount {
         return 0;
     }
 
+    public void setFromSI(double value, UnitType fromUnitType) {
+        UnitType currentUnitType = unitType;
+        setSI(value, fromUnitType);
+        setSI(getSI(currentUnitType), currentUnitType);
+    }
+
+
     public boolean hasDensity(){
         return density > 0;
     }
 
     public boolean hasMolecularMass(){
-        return density > 0;
+        return molecularMass > 0;
     }
 
 }

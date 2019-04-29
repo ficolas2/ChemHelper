@@ -24,7 +24,7 @@ public class Solution {
     public Amount getSolute(){
         Amount solute = new Amount(Amount.UnitType.MOLE);
         solute.molecularMass = compound.getMolecularWeight();
-        concentration.getSoluteFromSolvent(solute, amount);
+        concentration.getSoluteFromSolution(solute, amount);
         return solute;
     }
 

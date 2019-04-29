@@ -1,5 +1,7 @@
 package com.hornedhorn.chemhelper.data.Units;
 
+import android.util.Log;
+
 import com.hornedhorn.chemhelper.data.Units.Amount.UnitType;
 
 public class Concentration {
@@ -33,7 +35,7 @@ public class Concentration {
     public double concentrationValue = 1;
     public ConcentrationUnit concentrationUnit = ConcentrationUnit.PURE;
 
-    public double pureDensity;
+    public double pureDensity = 1;
 
     public void setConcentrationUnit(String str) {
         for (ConcentrationUnit concentrationUnit : ConcentrationUnit.values())
@@ -43,26 +45,26 @@ public class Concentration {
             }
     }
 
-    public void getSoluteFromSolvent(Amount soluteAmount, Amount solventAmount){
+    public void getSoluteFromSolution(Amount soluteAmount, Amount solutionAmount){
         if ( isPure() )
-            soluteAmount.setFromSI(solventAmount.SIValue, solventAmount.unitType);
+            soluteAmount.setFromSI(solutionAmount.SIValue, solutionAmount.unitType);
         else{
             soluteAmount.density = pureDensity;
-            soluteAmount.setFromSI(solventAmount.getSI(concentrationUnit.solutionUnit) * concentrationValue
+            soluteAmount.setFromSI(solutionAmount.getSI(concentrationUnit.solutionUnit) * concentrationValue
                             / (concentrationUnit.percent ? 100.:1),
                     concentrationUnit.soluteUnit);
         }
     }
 
-    public boolean getSolutionFromSolute(Amount solutionAmount, Amount soluteAmount){
+    public void getSolutionFromSolute(Amount solutionAmount, Amount soluteAmount){
         if ( isPure() )
             solutionAmount.setFromSI(soluteAmount.SIValue, soluteAmount.unitType);
-
-        soluteAmount.density = pureDensity;
-        solutionAmount.setFromSI(soluteAmount.getSI(concentrationUnit.soluteUnit) / concentrationValue
-                        * (concentrationUnit.percent ? 100.:1),
-                concentrationUnit.solutionUnit );
-        return true;
+        else{
+            soluteAmount.density = pureDensity;
+            solutionAmount.setFromSI(soluteAmount.getSI(concentrationUnit.soluteUnit) / concentrationValue
+                            * (concentrationUnit.percent ? 100.:1),
+                    concentrationUnit.solutionUnit );
+        }
     }
 
     public void setFromSolution(Amount solution, Amount solute) {
