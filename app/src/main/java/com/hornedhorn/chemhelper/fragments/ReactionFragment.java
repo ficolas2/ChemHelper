@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.SpannableStringBuilder;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -86,7 +88,7 @@ public class ReactionFragment extends CompoundReciverFragment {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 reactants.clear();
                                 products.clear();
-                                clearViews();
+                                addSolutionViews();
                             }})
                         .setNegativeButton(android.R.string.no, null).show();
 
@@ -148,15 +150,13 @@ public class ReactionFragment extends CompoundReciverFragment {
     }
 
     private void addSolutionViews(){
+        reactantsLayout.removeAllViews();
+        productsLayout.removeAllViews();
         if ( reactants.size() == 0 && products.size() == 0 ){
             clearViewEmpty();
             reactionText.setVisibility(View.GONE);
             return;
         }
-
-        String reactionString = "";
-
-        boolean first = true;
 
         for (ReactionSolution solution : reactants){
             ReactionSolutionView solutionView = new ReactionSolutionView(getContext(), solution, this);
@@ -165,16 +165,7 @@ public class ReactionFragment extends CompoundReciverFragment {
             reactantSolutionViews.add(solutionView);
 
             ((LinearLayout.LayoutParams)solutionView.getLayoutParams()).gravity = Gravity.CENTER;
-
-            if (!first)
-                reactionString += " + ";
-            first = false;
-            reactionString += solution.compound.getFormulaString();
         }
-
-        reactionString += " -> ";
-
-        first = true;
 
         for (ReactionSolution solution : products){
             ReactionSolutionView solutionView = new ReactionSolutionView(getContext(), solution, this);
@@ -183,17 +174,42 @@ public class ReactionFragment extends CompoundReciverFragment {
             reactantSolutionViews.add(solutionView);
 
             ((LinearLayout.LayoutParams)solutionView.getLayoutParams()).gravity = Gravity.CENTER;
-
-            if (!first)
-                reactionString += " + ";
-            first = false;
-            reactionString += solution.compound.getFormulaString();
         }
 
-        reactionText.setText(reactionString);
-
         updateSolutionViews();
+    }
 
+    public void updateReactionText(){
+        SpannableStringBuilder reactionStr = new SpannableStringBuilder();
+
+        boolean first = true;
+
+        for (ReactionSolution solution : reactants){
+            appendCompound(first, reactionStr, solution);
+            first = false;
+        }
+
+        reactionStr.append(" -> ");
+
+        first = true;
+
+        for (ReactionSolution solution : products){
+            appendCompound(first, reactionStr, solution);
+            first = false;
+        }
+
+        Utils.addSubscripts(reactionStr);
+        reactionText.setText(reactionStr, TextView.BufferType.SPANNABLE);
+    }
+
+    private void appendCompound(boolean first, SpannableStringBuilder reactionStr, ReactionSolution solution ){
+        if (!first)
+            reactionStr.append(" + ");
+        if (solution.stoichiometricCoefficient != 1)
+            reactionStr.append(Utils.formatDisplayDouble(solution.stoichiometricCoefficient));
+        String formulaStr = solution.compound.getFormulaString();
+        reactionStr.append(formulaStr);
+        Log.e("sub", (reactionStr.length() - formulaStr.length()) + " " + reactionStr.length());
     }
 
     public void updateSolutionViews(){
@@ -213,12 +229,8 @@ public class ReactionFragment extends CompoundReciverFragment {
         }
         for (ReactionSolutionView view : productViews)
             view.update(wrongProducts);
-    }
 
-    private void clearViews(){
-        reactantsLayout.removeAllViews();
-        productsLayout.removeAllViews();
-        clearViewEmpty();
+        updateReactionText();
     }
 
     private void clearViewEmpty(){
@@ -309,7 +321,6 @@ public class ReactionFragment extends CompoundReciverFragment {
         solutions.remove(currentSolutionView.solution);
         products.remove(currentSolutionView.solution);
         reactants.remove(currentSolutionView.solution);
-        clearViews();
         addSolutionViews();
         currentSolutionView = null;
         solutionEditor.setVisibility(View.GONE);

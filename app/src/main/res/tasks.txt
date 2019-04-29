@@ -4,13 +4,14 @@ TODO add densities to compound data, and density graphs
 
 TODO Units
 TODO small numbers
-TODO Jaro–Winkler distance for search (better search)
-
 TODO Yield
 TODO Excess
 TODO Reaction balance
 
 TODO Do something with calculate -> change -> delete (clear amounts button?)
+
+TODO Jaro–Winkler distance for search (better search)
+
 TODO block mol if concentration is given in anything but pure
 TODO Search suggestions
 TODO subindices in formulas (CompoundAdapter)

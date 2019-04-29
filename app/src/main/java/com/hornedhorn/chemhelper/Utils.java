@@ -1,5 +1,11 @@
 package com.hornedhorn.chemhelper;
 
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.SubscriptSpan;
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -63,4 +69,18 @@ public class Utils {
         return formulaPattern.matcher(str).matches();
     }
 
+    public static boolean isAlphanumberic(char c){
+        return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                (c >= '0' && c <= '9');
+    }
+
+    public static void addSubscripts(SpannableStringBuilder builder) {
+        for (int i=1; i<builder.length(); i++){
+            if (Character.isDigit(builder.charAt(i)) && isAlphanumberic(builder.charAt(i-1))){
+                builder.setSpan(new SubscriptSpan(), i, i+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                builder.setSpan(new RelativeSizeSpan(0.65f), i, i+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+    }
 }

@@ -2,6 +2,7 @@ package com.hornedhorn.chemhelper.views;
 
 import android.content.Context;
 import android.support.annotation.ColorInt;
+import android.text.SpannableStringBuilder;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -48,7 +49,10 @@ public class ReactionSolutionView extends RelativeLayout {
 
         stoichiometry.setTextColor(solution.stoichiometricCoefficient<=0 ? wrongTextColor:textColor);
         stoichiometry.setText(Utils.formatDisplayDouble(solution.stoichiometricCoefficient));
-        formula.setText( solution.compound.getFormulaString());
+
+        SpannableStringBuilder formulaStr = new SpannableStringBuilder( solution.compound.getFormulaString() );
+        Utils.addSubscripts(formulaStr);
+        formula.setText( formulaStr, TextView.BufferType.SPANNABLE );
 
         if ( !solution.concentration.isPure())
             concentration.setText( Utils.formatDisplayDouble(solution.concentration.concentrationValue) + " " +

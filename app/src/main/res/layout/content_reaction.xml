@@ -29,10 +29,8 @@
             android:freezesText="false"
             android:gravity="center"
             android:minHeight="30dp"
-            app:autoSizeMaxTextSize="20dp"
-            app:autoSizeMinTextSize="12dp"
-            app:autoSizeStepGranularity="1dp"
-            app:autoSizeTextType="uniform" />
+            android:textSize="14dp"
+            app:autoSizeStepGranularity="1dp" />
 
         <HorizontalScrollView
             android:id="@+id/reaction_scroll"
