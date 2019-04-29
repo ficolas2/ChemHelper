@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#222b3a</color>
     <color name="colorAccent">#1a50a3</color>
     <color name="backgroundHighlight">#363636</color>
+    <color name="highlightHighlight">#606060</color>
 
     <color name="reactive_nonmetal">#e8b100</color>
     <color name="alkali_metal">#ad0000</color>

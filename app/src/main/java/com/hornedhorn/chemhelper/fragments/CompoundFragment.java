@@ -1,14 +1,19 @@
 package com.hornedhorn.chemhelper.fragments;
 
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,6 +29,7 @@ import com.hornedhorn.chemhelper.R;
 import com.hornedhorn.chemhelper.Utils;
 import com.hornedhorn.chemhelper.cdk.MolecularFormulaManipulator;
 import com.hornedhorn.chemhelper.data.Compound;
+import com.hornedhorn.chemhelper.views.CompoundAdapter;
 
 import org.openscience.cdk.DefaultChemObjectBuilder;
 import org.openscience.cdk.interfaces.IMolecularFormula;
@@ -41,6 +47,8 @@ public class CompoundFragment extends Fragment {
     private CheckBox includedCheckbox, customCheckbox;
     private ListView compoundList;
     private String lastSearch;
+
+    private Compound contextMenuCompound;
 
     @Nullable
     @Override
@@ -77,6 +85,9 @@ public class CompoundFragment extends Fragment {
             }
         });
 
+        if (lastSearch!=null)
+            searchCompound(lastSearch);
+
         return view;
     }
 
@@ -96,15 +107,12 @@ public class CompoundFragment extends Fragment {
         }
 
 
-        final ArrayList<Map<String, String>> compounds = new ArrayList<>();
+        final ArrayList<Map<CompoundAdapter.CompoundAdapterData, String>> compounds = new ArrayList<>();
 
         String formulaStr = null;
         if (Utils.isFormula(str)) {
             IMolecularFormula molecularFormula = MolecularFormulaManipulator.getMolecularFormula(str, DefaultChemObjectBuilder.getInstance());
             formulaStr = MolecularFormulaManipulator.getString(molecularFormula);
-            Log.e("formula", formulaStr);
-        }else{
-            Log.e("nor formula", str);
         }
 
         str = str.toLowerCase();
@@ -120,47 +128,76 @@ public class CompoundFragment extends Fragment {
                         found = true;
 
             if (found){
-                Map<String, String> compoundMap = new HashMap<>();
+                Map<CompoundAdapter.CompoundAdapterData, String> compoundMap = new HashMap<>();
                 name = name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
-                compoundMap.put("name", name);
-                compoundMap.put("formula", compound.getFormulaString());
-                compoundMap.put("id", Integer.toString(compound.id));
+                compoundMap.put(CompoundAdapter.CompoundAdapterData.NAME, name);
+                compoundMap.put(CompoundAdapter.CompoundAdapterData.FORMULA, compound.getFormulaString());
+                compoundMap.put(CompoundAdapter.CompoundAdapterData.ID, Integer.toString(compound.id));
                 compounds.add(compoundMap);
             }
         }
 
-        Collections.sort(compounds, new Comparator<Map<String, String>>() {
+        Collections.sort(compounds, new Comparator<Map<CompoundAdapter.CompoundAdapterData, String>>() {
             @Override
-            public int compare(Map<String, String> o1, Map<String, String> o2) {
-                return Integer.signum(o1.get("name").length() - o2.get("name").length());
+            public int compare(Map<CompoundAdapter.CompoundAdapterData, String> o1, Map<CompoundAdapter.CompoundAdapterData, String> o2) {
+                return Integer.signum(o1.get(CompoundAdapter.CompoundAdapterData.NAME).length() -
+                        o2.get(CompoundAdapter.CompoundAdapterData.NAME).length());
             }
         });
 
-        String[] fromArray = {"name", "formula"};
-        int[] to = {R.id.compound_name, R.id.compound_formula};
-
-        SimpleAdapter adapter = new SimpleAdapter(getContext(), compounds, R.layout.compound_search_layout, fromArray, to);
+        CompoundAdapter adapter = new CompoundAdapter(getActivity(), compounds, this);
         compoundList.setAdapter(adapter);
-
-        compoundList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                MainActivity activity = (MainActivity) getActivity();
-                int compoundId = Integer.parseInt(compounds.get(i).get("id"));
-                Compound compound = application.allCompounds.get(compoundId);
-
-                receiverFragment.setCompound(compound);
-                if (setFragment)
-                    activity.setContentFragment(receiverFragment, true);
-                else
-                    activity.back();
-            }
-        });
 
     }
 
     public void setReceiverFragment(CompoundReciverFragment receiverFragment, boolean setFragment){
         this.receiverFragment = receiverFragment;
         this.setFragment = setFragment;
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+
+        menu.add(0, v.getId(), 0, "Edit");
+        menu.add(0, v.getId(), 0, "Delete");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        final ChemApplication application = (ChemApplication) getActivity().getApplication();
+        switch(item.getTitle().toString()){
+            case "Edit":
+
+                break;
+            case "Delete":
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Delete " + contextMenuCompound.getName())
+                        .setMessage("Do you really want to delete the compound?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                application.allCompounds.remove(contextMenuCompound);
+                                application.customCompounds.remove(contextMenuCompound);
+                            }})
+                        .setNegativeButton(android.R.string.no, null).show();
+                break;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    public void clickCompoundOptions(Compound compound) {
+
+    }
+
+    public void clickCompound(Compound compound) {
+        MainActivity activity = (MainActivity) getActivity();
+        receiverFragment.setCompound(compound);
+        if (setFragment)
+            activity.setContentFragment(receiverFragment, true);
+        else
+            activity.back();
     }
 }

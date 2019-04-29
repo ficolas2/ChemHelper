@@ -77,7 +77,9 @@ public class Utils {
 
     public static void addSubscripts(SpannableStringBuilder builder) {
         for (int i=1; i<builder.length(); i++){
-            if (Character.isDigit(builder.charAt(i)) && isAlphanumberic(builder.charAt(i-1))){
+            char c = builder.charAt(i);
+            char prevC = builder.charAt(i-1);
+            if (Character.isDigit(c) && (isAlphanumberic(prevC) || prevC == ')' ||prevC == ']')){
                 builder.setSpan(new SubscriptSpan(), i, i+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 builder.setSpan(new RelativeSizeSpan(0.65f), i, i+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
