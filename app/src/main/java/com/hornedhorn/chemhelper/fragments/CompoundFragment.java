@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.SearchView;
 import android.widget.SimpleAdapter;
 
@@ -155,41 +156,40 @@ public class CompoundFragment extends Fragment {
         this.setFragment = setFragment;
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
+    public void clickCompoundOptions(final Compound compound, View view) {
+        PopupMenu popup = new PopupMenu(getContext(), view);
+        MenuInflater inflater = popup.getMenuInflater();
+        inflater.inflate(R.menu.compound_menu, popup.getMenu());
+        popup.show();
 
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                MainActivity activity = (MainActivity) getActivity();
+                final ChemApplication application = (ChemApplication)activity.getApplication();
+                switch (item.getItemId()){
+                    case R.id.delete:
+                        new AlertDialog.Builder(getContext())
+                                .setTitle("Delete " + compound.getName())
+                                .setMessage("Do you really want to delete the compound?")
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
-        menu.add(0, v.getId(), 0, "Edit");
-        menu.add(0, v.getId(), 0, "Delete");
-    }
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        final ChemApplication application = (ChemApplication) getActivity().getApplication();
-        switch(item.getTitle().toString()){
-            case "Edit":
-
-                break;
-            case "Delete":
-                new AlertDialog.Builder(getContext())
-                        .setTitle("Delete " + contextMenuCompound.getName())
-                        .setMessage("Do you really want to delete the compound?")
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                application.allCompounds.remove(contextMenuCompound);
-                                application.customCompounds.remove(contextMenuCompound);
-                            }})
-                        .setNegativeButton(android.R.string.no, null).show();
-                break;
-        }
-        return super.onContextItemSelected(item);
-    }
-
-    public void clickCompoundOptions(Compound compound) {
-
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        application.allCompounds.remove(compound);
+                                        application.customCompounds.remove(compound);
+                                        application.saveCompounds();
+                                        searchCompound(lastSearch);
+                                    }})
+                                .setNegativeButton(android.R.string.no, null).show();
+                        return true;
+                    case R.id.edit:
+                        activity.setEditCompoundFragment(compound);
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
     }
 
     public void clickCompound(Compound compound) {

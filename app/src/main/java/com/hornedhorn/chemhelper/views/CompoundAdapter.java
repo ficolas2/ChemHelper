@@ -71,12 +71,12 @@ public class CompoundAdapter extends BaseAdapter {
         Utils.addSubscripts(formula);
         ((TextView)view.findViewById(R.id.compound_formula)).setText(formula, TextView.BufferType.SPANNABLE);
 
-        View options = view.findViewById(R.id.compound_options);
+        final View options = view.findViewById(R.id.compound_options);
         options.setVisibility(application.customCompounds.contains(compound) ? View.VISIBLE:View.GONE);
         options.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                compoundFragment.clickCompoundOptions(compound);
+                compoundFragment.clickCompoundOptions(compound, options);
             }
         });
 

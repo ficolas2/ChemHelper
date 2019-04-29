@@ -58,9 +58,7 @@ public class Compound {
         custom = false;
     }
 
-    public Compound(String name, String formula, int id) {
-        this.name = name;
-        setFormulaString(formula);
+    public Compound(int id) {
         this.id = id;
         custom = true;
     }

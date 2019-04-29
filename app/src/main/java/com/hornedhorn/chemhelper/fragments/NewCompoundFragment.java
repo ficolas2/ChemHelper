@@ -33,6 +33,11 @@ public class NewCompoundFragment extends CompoundReciverFragment {
         name = view.findViewById(R.id.new_compound_name);
         formula = view.findViewById(R.id.new_compound_formula);
 
+        if (compound!=null){
+            name.setText(compound.getName());
+            formula.setText(compound.getFormulaString());
+        }
+
         return view;
     }
 
@@ -50,9 +55,11 @@ public class NewCompoundFragment extends CompoundReciverFragment {
         ChemApplication application = (ChemApplication)activity.getApplication();
         String nameStr = name.getText().toString();
         String formulaStr = formula.getText().toString();
-        int id = application.allCompounds.size();
-        Compound compound = new Compound(nameStr, formulaStr, id);
-        application.addCustomCompound(compound);
+        if (compound == null)
+            compound = application.createCustomCompound();
+        compound.name = nameStr;
+        compound.setFormulaString(formulaStr);
+        application.saveCompounds();
         activity.back();
     }
 }

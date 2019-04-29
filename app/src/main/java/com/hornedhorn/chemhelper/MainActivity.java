@@ -182,6 +182,11 @@ public class MainActivity extends AppCompatActivity
 
 
     public void setNewCompoundFragment() {
+        setEditCompoundFragment(null);
+    }
+
+    public void setEditCompoundFragment(Compound compound) {
         setContentFragment(newCompoundFragment, true);
+        newCompoundFragment.setCompound(compound);
     }
 }

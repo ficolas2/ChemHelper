@@ -100,14 +100,7 @@ public class ChemApplication extends Application {
         return string;
     }
 
-    public void addCustomCompound(Compound compound){
-        customCompounds.add(compound);
-        allCompounds.add(compound);
-
-        saveCompounds();
-    }
-
-    private void saveCompounds(){
+    public void saveCompounds(){
 
         JSONArray jsonArray = new JSONArray();
 
@@ -121,5 +114,12 @@ public class ChemApplication extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public Compound createCustomCompound() {
+        Compound compound = new Compound(allCompounds.size());
+        customCompounds.add(compound);
+        allCompounds.add(compound);
+        return compound;
     }
 }
