@@ -3,9 +3,13 @@ package com.hornedhorn.chemhelper.fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -23,6 +27,7 @@ import com.hornedhorn.chemhelper.Utils;
 import com.hornedhorn.chemhelper.data.Compound;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
 import com.hornedhorn.chemhelper.data.Units.Amount;
+import com.hornedhorn.chemhelper.utils.InputFilterMinMax;
 import com.hornedhorn.chemhelper.views.ReactionSolutionView;
 import com.hornedhorn.chemhelper.views.SolutionEditor;
 
@@ -44,6 +49,8 @@ public class ReactionFragment extends CompoundReciverFragment {
 
     private LinearLayout reactantsLayout;
     private LinearLayout productsLayout;
+
+    private TextView yieldView;
 
     private ReactionSolutionView currentSolutionView;
 
@@ -121,6 +128,21 @@ public class ReactionFragment extends CompoundReciverFragment {
 
         solutionEditor = view.findViewById(R.id.solution_editor);
         solutionEditor.setReactionFragment( this );
+
+        yieldView = view.findViewById(R.id.reaction_yield);
+        yieldView.setFilters(new InputFilter[]{new InputFilterMinMax(0, 100)});
+        yieldView.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void afterTextChanged(Editable s) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    updateSolutionViews();
+                }
+
+            });
 
         addSolutionViews();
 
@@ -209,26 +231,31 @@ public class ReactionFragment extends CompoundReciverFragment {
             reactionStr.append(Utils.formatDisplayDouble(solution.stoichiometricCoefficient));
         String formulaStr = solution.compound.getFormulaString();
         reactionStr.append(formulaStr);
-        Log.e("sub", (reactionStr.length() - formulaStr.length()) + " " + reactionStr.length());
     }
 
     public void updateSolutionViews(){
+        @ColorInt int wrongTextColor = getResources().getColor(R.color.wrong);
+        @ColorInt int textColor = getResources().getColor(R.color.text);
         double reactantsEq = getEquivalent(reactants);
         double productsEq = getEquivalent(products);
+        double yield = getYield();
 
         boolean wrongReactants = reactantsEq<0;
         boolean wrongProducts = productsEq<0;
 
+        yieldView.setTextColor(textColor);
         if (!wrongReactants && !wrongProducts &&
                 reactantsEq != 0 && productsEq != 0 &&
-                !Utils.epsilonEqual(reactantsEq, productsEq, 1./1000))
+                !Utils.epsilonEqual(reactantsEq, productsEq / yield, 1./1000)){
+            yieldView.setTextColor( wrongTextColor );
             wrongProducts = wrongReactants = true;
+        }
 
         for (ReactionSolutionView view : reactantViews){
-            view.update(wrongReactants);
+            view.update(wrongReactants ? wrongTextColor : textColor);
         }
         for (ReactionSolutionView view : productViews)
-            view.update(wrongProducts);
+            view.update(wrongProducts ? wrongTextColor : textColor);
 
         updateReactionText();
     }
@@ -275,8 +302,10 @@ public class ReactionFragment extends CompoundReciverFragment {
     }
 
     private void calculate(){
-        double productsEquivalent = getEquivalent(products);
+        double yield = getYield();
+
         double reactantsEquivalent = getEquivalent(reactants);
+        double productsEquivalent = getEquivalent(products);
 
         if (productsEquivalent<0) {
             calculationError("Your products amounts don't match. Tip: leave only one amount.");
@@ -286,16 +315,46 @@ public class ReactionFragment extends CompoundReciverFragment {
             calculationError("Your reactants amounts don't match. Tip: leave only one amount.");
             return;
         }
+
+        if ( yield == 0 ){
+            if (productsEquivalent!= 0 && reactantsEquivalent != 0){
+                yield = productsEquivalent / reactantsEquivalent;
+                yieldView.setText(Utils.formatInputDouble(yield));
+            }else{
+                calculationError("Cannot calculate yield without at least one product and reactant amount.");
+                return;
+            }
+        }
+
         if ( productsEquivalent != 0 && reactantsEquivalent != 0  &&
-                        !Utils.epsilonEqual(productsEquivalent, reactantsEquivalent, 1./1000)){
+                        !Utils.epsilonEqual(reactantsEquivalent, productsEquivalent / yield, 1./1000)){
             calculationError("Your reactants amounts don't match with your products. Tip: leave only one amount.");
             return;
         }
 
-
-        double equivalent = Math.max(reactantsEquivalent, productsEquivalent);
-        if ( equivalent <= 0 )
+        if ( reactantsEquivalent == 0 && productsEquivalent == 0) {
             calculationError("Not enough data");
+            return;
+        }
+
+        Log.e("" + reactantsEquivalent, "" + productsEquivalent);
+
+        if (reactantsEquivalent == 0)
+            reactantsEquivalent = productsEquivalent / yield;
+        else if (productsEquivalent == 0)
+            productsEquivalent = reactantsEquivalent * yield;
+
+
+        setEmptyEquivalents(reactants, reactantsEquivalent);
+        setEmptyEquivalents(products, productsEquivalent);
+
+
+        updateSolutionViews();
+        if ( currentSolutionView != null )
+            solutionEditor.update(currentSolutionView.solution);
+    }
+
+    private void setEmptyEquivalents(ArrayList<ReactionSolution> solutions, double equivalent){
 
         for (ReactionSolution solution : solutions){
             double moles = equivalent * solution.stoichiometricCoefficient;
@@ -307,10 +366,6 @@ public class ReactionFragment extends CompoundReciverFragment {
                 solution.concentration.setFromSolution(solution.amount, auxAmount);
             }
         }
-
-        updateSolutionViews();
-        if (currentSolutionView!=null)
-            solutionEditor.update(currentSolutionView.solution);
     }
 
     public ReactionSolutionView getCurrentSolutionView() {
@@ -324,5 +379,9 @@ public class ReactionFragment extends CompoundReciverFragment {
         addSolutionViews();
         currentSolutionView = null;
         solutionEditor.setVisibility(View.GONE);
+    }
+
+    private double getYield(){
+        return Utils.parseDouble(yieldView.getText().toString())/100;
     }
 }

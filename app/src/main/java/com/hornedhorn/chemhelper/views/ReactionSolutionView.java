@@ -43,11 +43,7 @@ public class ReactionSolutionView extends RelativeLayout {
         });
     }
 
-    public void update(boolean wrong){
-        @ColorInt int wrongTextColor = getResources().getColor(R.color.wrong);
-        @ColorInt int textColor = getResources().getColor(R.color.text);
-
-        stoichiometry.setTextColor(solution.stoichiometricCoefficient<=0 ? wrongTextColor:textColor);
+    public void update(@ColorInt int textColor){
         stoichiometry.setText(Utils.formatDisplayDouble(solution.stoichiometricCoefficient));
 
         SpannableStringBuilder formulaStr = new SpannableStringBuilder( solution.compound.getFormulaString() );
@@ -65,7 +61,7 @@ public class ReactionSolutionView extends RelativeLayout {
 
         amount.setText( Utils.formatDisplayDouble(solution.amount.SIValue) + " " + solution.amount.unitType.str );
 
-        amount.setTextColor( wrong ? wrongTextColor:textColor );
+        amount.setTextColor( textColor );
     }
 
     public void clearSelection(){

@@ -94,6 +94,12 @@
                     android:background="@color/colorPrimary" />
 
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Boiling point:"
+                    android:textSize="20sp" />
+
+                <TextView
                     android:id="@+id/info_boiling_point"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -102,11 +108,6 @@
                     android:text="96ºC"
                     android:textSize="20sp" />
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Boiling point:"
-                    android:textSize="20sp" />
             </LinearLayout>
 
             <View
