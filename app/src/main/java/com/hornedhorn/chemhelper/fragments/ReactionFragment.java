@@ -53,6 +53,7 @@ public class ReactionFragment extends CompoundReciverFragment {
     private TextView yieldView;
 
     private ReactionSolutionView currentSolutionView;
+    private boolean currentSolutionReactant;
 
     private TextView reactionText;
 
@@ -152,7 +153,7 @@ public class ReactionFragment extends CompoundReciverFragment {
     private double getEquivalent(ReactionSolution solution){
         if (solution.concentration.concentrationValue <= 0 || solution.amount.SIValue <= 0 )
             return 0;
-        return solution.getSolute().getSI(Amount.UnitType.MOLE) / solution.stoichiometricCoefficient;
+        return solution.getSolute().getSI(Amount.UnitType.MOLE) / solution.stoichiometricCoefficient / ( 1 + solution.excess/100 );
     }
 
     private double getEquivalent(ArrayList<ReactionSolution> solutions){
@@ -284,6 +285,7 @@ public class ReactionFragment extends CompoundReciverFragment {
     public void selectSolution(ReactionSolutionView solutionView){
         this.currentSolutionView = solutionView;
         clearSolutionSelection();
+        solutionEditor.setReactant(reactantViews.contains(solutionView));
         solutionEditor.update(solutionView.solution);
     }
 
@@ -357,7 +359,7 @@ public class ReactionFragment extends CompoundReciverFragment {
     private void setEmptyEquivalents(ArrayList<ReactionSolution> solutions, double equivalent){
 
         for (ReactionSolution solution : solutions){
-            double moles = equivalent * solution.stoichiometricCoefficient;
+            double moles = equivalent * solution.stoichiometricCoefficient * ( 1 + solution.excess/100 );
             if (solution.amount.SIValue <= 0) {
                 solution.setSolute(moles, Amount.UnitType.MOLE);
             } else if ( !solution.concentration.isPure() && solution.concentration.concentrationValue <= 0){

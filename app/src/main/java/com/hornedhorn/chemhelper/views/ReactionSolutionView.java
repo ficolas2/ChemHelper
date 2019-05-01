@@ -58,8 +58,12 @@ public class ReactionSolutionView extends RelativeLayout {
 
         name.setText( solution.compound.getName() );
 
+        String amountText = Utils.formatDisplayDouble(solution.amount.SIValue) + " " + solution.amount.unitType.str;
 
-        amount.setText( Utils.formatDisplayDouble(solution.amount.SIValue) + " " + solution.amount.unitType.str );
+        if (solution.excess != 0)
+            amountText += " (" + Utils.formatDisplayDouble(solution.excess) + "% excess)";
+
+        amount.setText( amountText );
 
         amount.setTextColor( textColor );
     }

@@ -3,6 +3,7 @@ package com.hornedhorn.chemhelper.views;
 import android.content.Context;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.View;
@@ -24,13 +25,9 @@ public class SolutionEditor extends RelativeLayout {
     private ReactionFragment reactionFragment;
 
     private final TextView name, formula;
-    private final EditText stoichiometry;
-    private final EditText concentrationEditText;
-    private final EditText amount;
-    private final Spinner concentrationUnit;
-    private final Spinner amountUnit;
-    private final EditText density;
-    private final View densityLayout;
+    private final EditText stoichiometry, excess, concentrationEditText, amount, density;
+    private final Spinner concentrationUnit, amountUnit;
+    private final View densityLayout, excessLayout;
 
     private final EditText pureDensity;
     private final View pureDensityLayout;
@@ -61,6 +58,25 @@ public class SolutionEditor extends RelativeLayout {
 
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override  public void afterTextChanged(Editable s) {}
+        });
+
+        //Excess
+        excessLayout = findViewById(R.id.solution_excess_layout);
+        excess = findViewById(R.id.solution_excess);
+        excess.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
+                if ( currentSolutionView == null )
+                    return;
+                currentSolutionView.solution.excess = Utils.parseDouble(s.toString());
+                reactionFragment.updateSolutionViews();
+            }
         });
 
         //Concentration (value)
@@ -181,10 +197,13 @@ public class SolutionEditor extends RelativeLayout {
         setVisibility(View.VISIBLE);
 
         name.setText(solution.compound.getName());
-        formula.setText(solution.compound.getFormulaString());
+        SpannableStringBuilder formulaStr = new SpannableStringBuilder(solution.compound.getFormulaString());
+        Utils.addSubscripts(formulaStr);
+        formula.setText(formulaStr, TextView.BufferType.SPANNABLE);
 
         stoichiometry.setText(Utils.formatInputDouble(solution.stoichiometricCoefficient));
 
+        excess.setText(Utils.formatInputDouble(solution.excess));
 
         concentrationEditText.setVisibility(
                 solution.concentration.concentrationUnit == Concentration.ConcentrationUnit.PURE ? View.GONE:View.VISIBLE);
@@ -222,5 +241,9 @@ public class SolutionEditor extends RelativeLayout {
 
     public void setReactionFragment(ReactionFragment reactionFragment) {
         this.reactionFragment = reactionFragment;
+    }
+
+    public void setReactant(boolean reactant) {
+        excessLayout.setVisibility(reactant ? VISIBLE:GONE);
     }
 }
