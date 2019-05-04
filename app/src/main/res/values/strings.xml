@@ -12,8 +12,15 @@
     <string name="compound_name"><u>- Compound name</u></string>
 
     <string-array name="amount_units">
+        <item>mg</item>
+        <item>g</item>
         <item>kg</item>
+        <item>t</item>
+
+        <item>mL</item>
         <item>L</item>
+        <item>kL</item>
+
         <item>mol</item>
     </string-array>
 

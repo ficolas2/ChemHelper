@@ -18,12 +18,12 @@ public class Solution {
 
     public Solution(Compound compound){
         this.compound = compound;
-        amount.molecularMass = compound.getMolecularWeight();
+        amount.setMolecularMass( compound.getMolecularWeight() );
     }
 
     public Amount getSolute(){
-        Amount solute = new Amount(Amount.UnitType.MOLE);
-        solute.molecularMass = compound.getMolecularWeight();
+        Amount solute = new Amount(Amount.Unit.MOLE);
+        solute.setMolecularMass( compound.getMolecularWeight());
         concentration.getSoluteFromSolution(solute, amount);
         return solute;
     }
@@ -32,18 +32,18 @@ public class Solution {
         concentration.getSolutionFromSolute(amount, soluteAmount);
     }
 
-    public void setSolute(double soluteAmount, Amount.UnitType soluteUnitType){
-        auxAmount.molecularMass = compound.getMolecularWeight();
-        auxAmount.setFromSI(soluteAmount, soluteUnitType);
+    public void setSolute(double soluteAmount, Amount.Unit soluteUnit){
+        auxAmount.setMolecularMass( compound.getMolecularWeight() );
+        auxAmount.setFromValue(soluteAmount, soluteUnit);
         setSolute(auxAmount);
     }
 
     public void setDensity(double density){
-        amount.density = density;
+        amount.setDensity(density);
     }
 
     public double getDensity(){
-        return amount.density;
+        return amount.getDensity();
     }
 
     public void setPureDensity(double density) {
@@ -56,8 +56,8 @@ public class Solution {
 
     public boolean needsDensity() {
         if (concentration.isPure())
-            return amount.unitType == Amount.UnitType.VOLUME;
-        return (concentration.concentrationUnit.solutionUnit != Amount.UnitType.VOLUME) == (amount.unitType == Amount.UnitType.VOLUME);
+            return amount.getUnit().unitType == Amount.UnitType.VOLUME;
+        return (concentration.concentrationUnit.solutionUnit != Amount.UnitType.VOLUME) == (amount.getUnit().unitType == Amount.UnitType.VOLUME);
     }
 
     public boolean needsPureDensity(){

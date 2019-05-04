@@ -151,7 +151,7 @@ public class ReactionFragment extends CompoundReciverFragment {
     }
 
     private double getEquivalent(ReactionSolution solution){
-        if (solution.concentration.concentrationValue <= 0 || solution.amount.SIValue <= 0 )
+        if (solution.concentration.concentrationValue <= 0 || solution.amount.getValue() <= 0 )
             return 0;
         return solution.getSolute().getSI(Amount.UnitType.MOLE) / solution.stoichiometricCoefficient / ( 1 + solution.excess/100 );
     }
@@ -360,11 +360,11 @@ public class ReactionFragment extends CompoundReciverFragment {
 
         for (ReactionSolution solution : solutions){
             double moles = equivalent * solution.stoichiometricCoefficient * ( 1 + solution.excess/100 );
-            if (solution.amount.SIValue <= 0) {
-                solution.setSolute(moles, Amount.UnitType.MOLE);
+            if (solution.amount.getValue() <= 0) {
+                solution.setSolute(moles, Amount.Unit.MOLE);
             } else if ( !solution.concentration.isPure() && solution.concentration.concentrationValue <= 0){
-                auxAmount.setSI(moles, Amount.UnitType.MOLE); //Solute
-                auxAmount.molecularMass = solution.compound.getMolecularWeight();
+                auxAmount.setValue(moles, Amount.Unit.MOLE); //Solute
+                auxAmount.setMolecularMass( solution.compound.getMolecularWeight() );
                 solution.concentration.setFromSolution(solution.amount, auxAmount);
             }
         }

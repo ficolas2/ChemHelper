@@ -101,8 +101,7 @@ public class SolutionEditor extends RelativeLayout {
                 ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
                 if ( currentSolutionView == null  )
                     return;
-                String str = s.toString();
-                currentSolutionView.solution.amount.SIValue = Utils.parseDouble(s.toString());
+                currentSolutionView.solution.amount.setValue( Utils.parseDouble(s.toString()) );
                 reactionFragment.updateSolutionViews();
             }
 
@@ -117,7 +116,9 @@ public class SolutionEditor extends RelativeLayout {
                 ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
                 if ( currentSolutionView == null )
                     return;
-                currentSolutionView.solution.amount.setUnitType((String)amountUnit.getItemAtPosition(position));
+                currentSolutionView.solution.amount.setUnit((String)amountUnit.getItemAtPosition(position));
+                currentSolutionView.solution.amount.setValue(Utils.parseDouble(amount.getText().toString()));
+
                 reactionFragment.updateSolutionViews();
                 updateDensity(currentSolutionView.solution);
             }
@@ -209,7 +210,7 @@ public class SolutionEditor extends RelativeLayout {
                 solution.concentration.concentrationUnit == Concentration.ConcentrationUnit.PURE ? View.GONE:View.VISIBLE);
         concentrationEditText.setText(Utils.formatInputDouble(solution.concentration.concentrationValue));
 
-        amount.setText(Utils.formatInputDouble(solution.amount.SIValue));
+        amount.setText(Utils.formatInputDouble(solution.amount.getValue()));
 
         String[] concentrationArr = getResources().getStringArray(R.array.concentration_units);
         for (int i = 0; i<concentrationArr.length; i++){
@@ -221,7 +222,7 @@ public class SolutionEditor extends RelativeLayout {
 
         String[] amountArr = getResources().getStringArray(R.array.amount_units);
         for (int i = 0; i<amountArr.length; i++){
-            if (amountArr[i].equals( solution.amount.unitType.str )) {
+            if (amountArr[i].equals( solution.amount.getUnit().str )) {
                 amountUnit.setSelection(i);
                 break;
             }

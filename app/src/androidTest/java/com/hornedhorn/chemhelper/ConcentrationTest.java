@@ -12,7 +12,7 @@ public class ConcentrationTest {
     private Concentration molar, wtp, volp, molp, kgl, molal, pure;
     private double epsilon = 0.0000001;
 
-    {
+/*    {
         molar = new Concentration();
         molar.concentrationUnit = Concentration.ConcentrationUnit.MOLAR;
         molar.concentrationValue = 25;
@@ -120,6 +120,6 @@ public class ConcentrationTest {
         Amount solution = new Amount(10, Amount.UnitType.MASS);
         Amount solute = new Amount(2.5, Amount.UnitType.MASS);
         wtp.setFromSolution(solution, solute);
-    }
+    }*/
 
 }

@@ -1,0 +1,36 @@
+TODO unit tests for ReactionFragment stuff
+TODO order reactionFragment, get logic out of calculate()
+TODO debug info when amount tries to convert without density or molar mass
+
+TODO density unit
+TODO small numbers
+TODO Reaction balancer
+TODO add densities to compound data, and density graphs
+
+TODO formula verifier for compound creation
+TODO more info in compound creation
+TODO density in compound creation
+
+TODO Do something with calculate -> change data -> delete (clear amounts button?), and add coloring for what will get calculated
+
+TODO Jaro–Winkler distance for search (better search)
+
+TODO Ads
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+TODO translation
+TODO compound drawing from smiles
+
+-----------------------------------------------------------------------------------------------------------------------------
+TODO equilibrium
+
+TODO block mol if concentration is given in anything but pure
+TODO Search suggestions
+
+TODO solubility data, solubility curves
+
+TODO Concentration conversion (Possible with reactions, but not ideal)
+TODO pH calculation
+TODO recrystalization helper
+TODO chromatography

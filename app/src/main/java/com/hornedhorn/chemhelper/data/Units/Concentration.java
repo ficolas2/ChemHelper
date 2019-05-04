@@ -47,28 +47,28 @@ public class Concentration {
 
     public void getSoluteFromSolution(Amount soluteAmount, Amount solutionAmount){
         if ( isPure() )
-            soluteAmount.setFromSI(solutionAmount.SIValue, solutionAmount.unitType);
+            soluteAmount.setFromValue(solutionAmount.getValue(), solutionAmount.getUnit());
         else{
-            soluteAmount.density = pureDensity;
-            soluteAmount.setFromSI(solutionAmount.getSI(concentrationUnit.solutionUnit) * concentrationValue
+            soluteAmount.setDensity( pureDensity );
+            soluteAmount.setFromValue(solutionAmount.getSI(concentrationUnit.solutionUnit) * concentrationValue
                             / (concentrationUnit.percent ? 100.:1),
-                    concentrationUnit.soluteUnit);
+                    concentrationUnit.soluteUnit.SIUnit);
         }
     }
 
     public void getSolutionFromSolute(Amount solutionAmount, Amount soluteAmount){
         if ( isPure() )
-            solutionAmount.setFromSI(soluteAmount.SIValue, soluteAmount.unitType);
+            solutionAmount.setFromValue(soluteAmount.getValue(), soluteAmount.getUnit());
         else{
-            soluteAmount.density = pureDensity;
-            solutionAmount.setFromSI(soluteAmount.getSI(concentrationUnit.soluteUnit) / concentrationValue
+            soluteAmount.setDensity( pureDensity );
+            solutionAmount.setFromValue(soluteAmount.getSI(concentrationUnit.soluteUnit) / concentrationValue
                             * (concentrationUnit.percent ? 100.:1),
-                    concentrationUnit.solutionUnit );
+                    concentrationUnit.solutionUnit.SIUnit );
         }
     }
 
     public void setFromSolution(Amount solution, Amount solute) {
-        solute.density = pureDensity;
+        solute.setDensity( pureDensity );
         concentrationValue = solute.getSI(concentrationUnit.soluteUnit) / solution.getSI(concentrationUnit.solutionUnit)
                 * (concentrationUnit.percent ? 100:1);
     }
