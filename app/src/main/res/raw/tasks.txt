@@ -2,8 +2,6 @@ TODO unit tests for ReactionFragment stuff
 TODO order reactionFragment, get logic out of calculate()
 TODO debug info when amount tries to convert without density or molar mass
 
-TODO density unit
-TODO small numbers
 TODO Reaction balancer
 TODO add densities to compound data, and density graphs
 

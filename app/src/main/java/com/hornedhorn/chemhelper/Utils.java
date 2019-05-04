@@ -13,12 +13,16 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-        private static final Pattern formulaPattern = Pattern.compile("(\\(?([A-Z][a-z]?)[0-9]*\\)?)*");
+    private static final int significantDigits = 6;
+    private static final Pattern formulaPattern = Pattern.compile("(\\(?([A-Z][a-z]?)[0-9]*\\)?)*");
 
     public static String formatInputDouble(double value){
         if ( value <= 0 )
             return "";
-        String str = String.format( "%.3f", value );
+        int offset = (int)Math.log10(value) + 1;
+        offset = Math.min(significantDigits, offset);
+
+        String str = String.format( "%." + (significantDigits - offset) + "f", value );
         str = str.replaceAll(",*0+$", "");
         return str;
     }
@@ -26,7 +30,11 @@ public class Utils {
     public static String formatDisplayDouble(double value){
         if ( value <= 0 )
             return "?";
-        return formatInputDouble(value);
+        String str = formatInputDouble(value);
+        int exponent = (int) Math.log10(value);
+        if ( exponent >= significantDigits)
+            str = str.charAt(0) + "," + str.substring(1, significantDigits) + "e" + exponent;
+        return str;
     }
 
     public static boolean epsilonEqual(double d1, double d2, double epsilon) {
