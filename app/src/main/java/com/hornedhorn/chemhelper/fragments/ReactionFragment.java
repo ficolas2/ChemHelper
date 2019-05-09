@@ -10,12 +10,12 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -26,6 +26,7 @@ import com.hornedhorn.chemhelper.R;
 import com.hornedhorn.chemhelper.Utils;
 import com.hornedhorn.chemhelper.data.Compound;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
+import com.hornedhorn.chemhelper.data.Solution;
 import com.hornedhorn.chemhelper.data.Units.Amount;
 import com.hornedhorn.chemhelper.utils.InputFilterMinMax;
 import com.hornedhorn.chemhelper.views.ReactionSolutionView;
@@ -43,19 +44,20 @@ public class ReactionFragment extends CompoundReciverFragment {
 
     private ArrayList<ReactionSolutionView> reactantViews = new ArrayList<>();
     private ArrayList<ReactionSolutionView> productViews = new ArrayList<>();
-    private ArrayList<ReactionSolutionView> reactantSolutionViews = new ArrayList<>();
+    private ArrayList<ReactionSolutionView> solutionViews = new ArrayList<>();
 
     private SolutionEditor solutionEditor;
 
     private LinearLayout reactantsLayout;
     private LinearLayout productsLayout;
 
-    private TextView yieldView;
+    private TextView yieldView, errorText;
 
     private ReactionSolutionView currentSolutionView;
     private boolean currentSolutionReactant;
 
     private TextView reactionText;
+    private Button reactionSubmit;
 
     private Amount auxAmount = new Amount();
 
@@ -103,7 +105,8 @@ public class ReactionFragment extends CompoundReciverFragment {
             }
         });
 
-        view.findViewById(R.id.reaction_submit).setOnClickListener(new View.OnClickListener() {
+        reactionSubmit = view.findViewById(R.id.reaction_submit);
+        reactionSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 calculate();
@@ -145,31 +148,11 @@ public class ReactionFragment extends CompoundReciverFragment {
 
             });
 
+        errorText = view.findViewById(R.id.reaction_error);
+
         addSolutionViews();
 
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    private double getEquivalent(ReactionSolution solution){
-        if (solution.concentration.concentrationValue <= 0 || solution.amount.getValue() <= 0 )
-            return 0;
-        return solution.getSolute().getSI(Amount.UnitType.MOLE) / solution.stoichiometricCoefficient / ( 1 + solution.excess/100 );
-    }
-
-    private double getEquivalent(ArrayList<ReactionSolution> solutions){
-        double equivalent = 0;
-        for (ReactionSolution solution : solutions){
-            if (solution.stoichiometricCoefficient==0)
-                return -1;
-            double solEq = getEquivalent(solution);
-
-            if (solEq != 0) {
-                if (equivalent != 0 && !Utils.epsilonEqual(solEq, equivalent, 1. / 1000))
-                    return -1;
-                equivalent = solEq;
-            }
-        }
-        return equivalent;
     }
 
     private void addSolutionViews(){
@@ -185,7 +168,7 @@ public class ReactionFragment extends CompoundReciverFragment {
             ReactionSolutionView solutionView = new ReactionSolutionView(getContext(), solution, this);
             reactantsLayout.addView(solutionView);
             reactantViews.add(solutionView);
-            reactantSolutionViews.add(solutionView);
+            solutionViews.add(solutionView);
 
             ((LinearLayout.LayoutParams)solutionView.getLayoutParams()).gravity = Gravity.CENTER;
         }
@@ -194,7 +177,7 @@ public class ReactionFragment extends CompoundReciverFragment {
             ReactionSolutionView solutionView = new ReactionSolutionView(getContext(), solution, this);
             productsLayout.addView(solutionView);
             productViews.add(solutionView);
-            reactantSolutionViews.add(solutionView);
+            solutionViews.add(solutionView);
 
             ((LinearLayout.LayoutParams)solutionView.getLayoutParams()).gravity = Gravity.CENTER;
         }
@@ -235,28 +218,15 @@ public class ReactionFragment extends CompoundReciverFragment {
     }
 
     public void updateSolutionViews(){
-        @ColorInt int wrongTextColor = getResources().getColor(R.color.wrong);
-        @ColorInt int textColor = getResources().getColor(R.color.text);
-        double reactantsEq = getEquivalent(reactants);
-        double productsEq = getEquivalent(products);
-        double yield = getYield();
+        for (ReactionSolutionView view : solutionViews)
+            view.update();
 
-        boolean wrongReactants = reactantsEq<0;
-        boolean wrongProducts = productsEq<0;
+        String error = getError();
 
-        yieldView.setTextColor(textColor);
-        if (!wrongReactants && !wrongProducts &&
-                reactantsEq != 0 && productsEq != 0 &&
-                !Utils.epsilonEqual(reactantsEq, productsEq / yield, 1./1000)){
-            yieldView.setTextColor( wrongTextColor );
-            wrongProducts = wrongReactants = true;
-        }
-
-        for (ReactionSolutionView view : reactantViews){
-            view.update(wrongReactants ? wrongTextColor : textColor);
-        }
-        for (ReactionSolutionView view : productViews)
-            view.update(wrongProducts ? wrongTextColor : textColor);
+        errorText.setVisibility(error != null ? View.VISIBLE:View.GONE);
+        reactionSubmit.setEnabled(error == null);
+        if (error!=null)
+            errorText.setText(error);
 
         updateReactionText();
     }
@@ -290,57 +260,73 @@ public class ReactionFragment extends CompoundReciverFragment {
     }
 
     public void clearSolutionSelection(){
-        for (ReactionSolutionView view : reactantSolutionViews){
+        for (ReactionSolutionView view : solutionViews){
             view.clearSelection();
         }
     }
 
-    private void calculationError(String error){
-        new AlertDialog.Builder(getContext())
-                .setTitle("Error calculating")
-                .setMessage(error)
-                .setPositiveButton(android.R.string.yes, null)
-                .show();
-    }
+    private String getError() {
+        if (products.size() == 0 && reactants.size() == 0)
+            return "Add products or reactants by clicking a + symbol.";
+        else if (products.size() == 0)
+            return "Add products by clicking the right + symbol.";
+        else if (reactants.size() == 0)
+            return "Add reactants by clicking the left + symbol.";
 
-    private void calculate(){
         double yield = getYield();
 
-        double reactantsEquivalent = getEquivalent(reactants);
-        double productsEquivalent = getEquivalent(products);
+        double reactantsEquivalent = Utils.getEquivalent(reactants);
+        double productsEquivalent = Utils.getEquivalent(products);
 
-        if (productsEquivalent<0) {
-            calculationError("Your products amounts don't match. Tip: leave only one amount.");
-            return;
-        }
-        if (reactantsEquivalent<0) {
-            calculationError("Your reactants amounts don't match. Tip: leave only one amount.");
-            return;
-        }
+        if (productsEquivalent<0)
+            return "Your products amounts don't match. Tip: leave only one amount.";
+        if (reactantsEquivalent<0)
+            return "Your reactants amounts don't match. Tip: leave only one amount.";
 
-        if ( yield == 0 ){
-            if (productsEquivalent!= 0 && reactantsEquivalent != 0){
-                yield = productsEquivalent / reactantsEquivalent;
-                yieldView.setText(Utils.formatInputDouble(yield));
-            }else{
-                calculationError("Cannot calculate yield without at least one product and reactant amount.");
-                return;
-            }
-        }
+        if ( yield == 0 )
+            if (productsEquivalent!= 0 && reactantsEquivalent != 0)
+                yield = productsEquivalent / reactantsEquivalent; // Yield
+            else
+                return "Cannot calculate yield without at least one product and reactant amount.";
 
         if ( productsEquivalent != 0 && reactantsEquivalent != 0  &&
-                        !Utils.epsilonEqual(reactantsEquivalent, productsEquivalent / yield, 1./1000)){
-            calculationError("Your reactants amounts don't match with your products. Tip: leave only one amount.");
-            return;
+                !Utils.epsilonEqual(reactantsEquivalent, productsEquivalent / yield, 1./1000)){
+            return "Your reactants amounts don't match with your products. Tip: leave only one amount.";
         }
 
         if ( reactantsEquivalent == 0 && productsEquivalent == 0) {
-            calculationError("Not enough data");
-            return;
+            return "Not enough data.";
         }
 
-        Log.e("" + reactantsEquivalent, "" + productsEquivalent);
+        String text = "";
+        for (Solution solution : solutions){
+            if (solution.needsDensity() && solution.getDensity() <= 0)
+                text += solution.compound.getName() + " needs density.\n";
+            if (solution.needsPureDensity() && solution.getPureDensity() <= 0)
+                text += solution.compound.getName() + " needs pure density.\n";
+        }
 
+        return text.isEmpty() ? null:text;
+    }
+
+    private void calculate(){
+        if (getError() != null)
+            return;
+
+        double yield = getYield();
+
+        double reactantsEquivalent = Utils.getEquivalent(reactants);
+        double productsEquivalent = Utils.getEquivalent(products);
+
+
+        if ( yield == 0 ){
+            if (productsEquivalent!= 0 && reactantsEquivalent != 0){
+                yield = productsEquivalent / reactantsEquivalent; // Yield
+                yieldView.setText(Utils.formatInputDouble(yield));
+            }
+        }
+
+        // Reactants/products equivalent from the other one and yield
         if (reactantsEquivalent == 0)
             reactantsEquivalent = productsEquivalent / yield;
         else if (productsEquivalent == 0)

@@ -13,8 +13,6 @@ public class Solution {
     public final Amount amount = new Amount();
     public final Concentration concentration = new Concentration();
 
-    public double pureDensity, density;
-
 
     public Solution(Compound compound){
         this.compound = compound;

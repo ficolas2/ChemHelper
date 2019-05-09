@@ -102,18 +102,27 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
+            <Button
+                android:id="@+id/reaction_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:text="Calculate" />
+
+            <TextView
+                android:id="@+id/reaction_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/backgroundHighlight"
+                android:padding="10dp"
+                android:text="Add products or reactants by clicking a + symbol." />
+
             <com.hornedhorn.chemhelper.views.SolutionEditor
                 android:id="@+id/solution_editor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:visibility="gone" />
-
-            <Button
-                android:id="@+id/reaction_submit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Calculate" />
 
             <LinearLayout
                 android:layout_width="match_parent"

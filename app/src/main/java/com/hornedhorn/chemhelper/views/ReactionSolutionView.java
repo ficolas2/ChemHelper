@@ -43,7 +43,7 @@ public class ReactionSolutionView extends RelativeLayout {
         });
     }
 
-    public void update(@ColorInt int textColor){
+    public void update(){
         stoichiometry.setText(Utils.formatDisplayDouble(solution.stoichiometricCoefficient));
 
         SpannableStringBuilder formulaStr = new SpannableStringBuilder( solution.compound.getFormulaString() );
@@ -64,8 +64,6 @@ public class ReactionSolutionView extends RelativeLayout {
             amountText += " (" + Utils.formatDisplayDouble(solution.excess) + "% excess)";
 
         amount.setText( amountText );
-
-        amount.setTextColor( textColor );
     }
 
     public void clearSelection(){

@@ -4,11 +4,14 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SubscriptSpan;
-import android.util.Log;
+
+import com.hornedhorn.chemhelper.data.ReactionSolution;
+import com.hornedhorn.chemhelper.data.Units.Amount;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class Utils {
@@ -92,5 +95,21 @@ public class Utils {
                 builder.setSpan(new RelativeSizeSpan(0.65f), i, i+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
+    }
+
+    public static double getEquivalent(ArrayList<ReactionSolution> solutions){
+        double equivalent = 0;
+        for (ReactionSolution solution : solutions){
+            if (solution.stoichiometricCoefficient==0)
+                return -1;
+            double solEq = solution.getEquivalent();
+
+            if (solEq != 0) {
+                if (equivalent != 0 && !Utils.epsilonEqual(solEq, equivalent, 1. / 1000))
+                    return -1;
+                equivalent = solEq;
+            }
+        }
+        return equivalent;
     }
 }
