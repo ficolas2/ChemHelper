@@ -10,6 +10,8 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.util.SparseArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +34,16 @@ import com.hornedhorn.chemhelper.utils.InputFilterMinMax;
 import com.hornedhorn.chemhelper.views.ReactionSolutionView;
 import com.hornedhorn.chemhelper.views.SolutionEditor;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.linear.DecompositionSolver;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.QRDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.linear.RealVector;
+import org.apache.commons.math3.linear.SingularMatrixException;
+import org.apache.commons.math3.linear.SingularValueDecomposition;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class ReactionFragment extends CompoundReciverFragment {
@@ -51,7 +63,7 @@ public class ReactionFragment extends CompoundReciverFragment {
     private LinearLayout reactantsLayout;
     private LinearLayout productsLayout;
 
-    private TextView yieldView, errorText;
+    private TextView yieldView, errorText, balanceText;
 
     private ReactionSolutionView currentSolutionView;
     private boolean currentSolutionReactant;
@@ -149,6 +161,13 @@ public class ReactionFragment extends CompoundReciverFragment {
             });
 
         errorText = view.findViewById(R.id.reaction_error);
+        balanceText = view.findViewById(R.id.reaction_balance);
+        balanceText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                balance();
+            }
+        });
 
         addSolutionViews();
 
@@ -206,6 +225,8 @@ public class ReactionFragment extends CompoundReciverFragment {
 
         Utils.addSubscripts(reactionStr);
         reactionText.setText(reactionStr, TextView.BufferType.SPANNABLE);
+
+        balanceText.setVisibility(isBalanced() ? View.GONE : View.VISIBLE);
     }
 
     private void appendCompound(boolean first, SpannableStringBuilder reactionStr, ReactionSolution solution ){
@@ -371,5 +392,150 @@ public class ReactionFragment extends CompoundReciverFragment {
 
     private double getYield(){
         return Utils.parseDouble(yieldView.getText().toString())/100;
+    }
+
+    private void errorBox(String message){
+        new AlertDialog.Builder(getContext())
+                .setTitle("Error")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.yes, null)
+                .show();
+    }
+
+    private void balance(){
+        SparseArray<Integer> reactantElements = getElements(reactants);
+        SparseArray<Integer> productElements = getElements(products);
+        ArrayList<Integer> atomicNumbers = new ArrayList<>();
+
+        if (reactantElements.size() != productElements.size()) {
+            errorBox("Reactants and products don't have the same elements.");
+            return;
+        }
+
+        for (int i = 0; i<reactantElements.size(); i++){
+            int atomicNumber = reactantElements.keyAt(i);
+            if (productElements.get(atomicNumber) == null){
+                errorBox("Reactants and products don't have the same elements.");
+                return;
+            }
+
+            atomicNumbers.add(atomicNumber);
+        }
+
+        double[][] matrixData = new double[atomicNumbers.size()][solutions.size()];
+
+        //Set up matrix
+        for (int i = 0; i<solutions.size(); i++){
+            Solution solution = solutions.get(i);
+            SparseArray<Integer> elements = solution.compound.getElements();
+            int multiplier = reactants.contains(solution) ? 1:-1;
+            for (int j =0; j<elements.size(); j++){
+                int atomicNumber = elements.keyAt(j);
+                matrixData[atomicNumbers.indexOf(atomicNumber)][i] = elements.get(atomicNumber) * multiplier;
+            }
+        }
+
+        RealVector realVector = new ArrayRealVector(atomicNumbers.size());
+        RealMatrix coefficients = MatrixUtils.createRealMatrix(atomicNumbers.size(), solutions.size() - 1);
+        RealVector systemResults;
+
+        for (int i = 0; i < solutions.size(); i++){
+            getMatrix(realVector, coefficients, matrixData, i);
+
+            try {
+                DecompositionSolver solver = new QRDecomposition(coefficients).getSolver();
+                systemResults = solver.solve(realVector);
+
+                int unitCoeff = 1;
+
+                for (int j = 0; j<solutions.size(); j++){
+                    ReactionSolution solution = solutions.get(j);
+                    if (j == i)
+                        Log.e (solution.compound.getName(), "" + unitCoeff);
+                    else
+                        Log.e (solution.compound.getName(), "" + systemResults.getEntry(j>i ? j-1:j));
+                }
+
+                int minDenominator;
+                do{
+                    minDenominator = -1;
+                    for (int solutionNumber = 0; solutionNumber < systemResults.getDimension(); solutionNumber++){
+                        double result = systemResults.getEntry(solutionNumber);
+                        if (result - Math.floor(result + 1E-6)>1E-6){
+                            int denominator = Utils.getDenominator(result);
+                            if (minDenominator>denominator || minDenominator<0)
+                                minDenominator = denominator;
+                        }
+                    }
+                    if (minDenominator>0){
+                        unitCoeff *= minDenominator;
+                        systemResults.mapMultiplyToSelf(minDenominator);
+                        Log.e("Multiplied by", "" + minDenominator);
+                    }
+                }while (minDenominator>0);
+
+                for (int j = 0; j<solutions.size(); j++){
+                    ReactionSolution solution = solutions.get(j);
+                    if (j == i)
+                        Log.e (solution.compound.getName(), "" + unitCoeff);
+                    else
+                        Log.e (solution.compound.getName(), "" + systemResults.getEntry(j>i ? j-1:j));
+                }
+
+                for (int j = 0; j<solutions.size(); j++){
+                    ReactionSolution solution = solutions.get(j);
+                    if (j == i)
+                        solution.stoichiometricCoefficient = unitCoeff;
+                    else
+                        solution.stoichiometricCoefficient = (int)Math.round(systemResults.getEntry(j>i ? j-1:j));
+                }
+
+                updateSolutionViews();
+                break;
+            }catch (SingularMatrixException e){
+            }
+        }
+
+    }
+
+    private void getMatrix(RealVector vector, RealMatrix coefficients, double[][] matrixData, int deletedColumn){
+        for (int x = 0; x<matrixData.length; x++){
+            for (int y = 0; y<matrixData[0].length; y++){
+                if (y == deletedColumn)
+                    vector.setEntry(x,  -matrixData[x][y]);
+                else
+                    coefficients.setEntry(x, y>deletedColumn ? y-1:y, matrixData[x][y]);
+            }
+        }
+    }
+
+    private boolean isBalanced(){
+
+        SparseArray<Integer> reactantElements = getElements(reactants);
+        SparseArray<Integer> productElements = getElements(products);
+
+        if (reactantElements.size() != productElements.size())
+            return false;
+
+        for (int i = 0; i<reactantElements.size(); i++){
+            int atomicNumber = reactantElements.keyAt(i);
+            if (reactantElements.get(atomicNumber, 0) != productElements.get(atomicNumber, 0))
+                return false;
+        }
+
+        return true;
+    }
+
+    private SparseArray<Integer> getElements(ArrayList<ReactionSolution> solutions){
+        SparseArray<Integer> totalElements = new SparseArray<>();
+        for (ReactionSolution solution : solutions){
+            SparseArray<Integer> elements = solution.compound.getElements();
+            for (int i = 0; i<elements.size(); i++){
+                int atomicNumber = elements.keyAt(i);
+                totalElements.put(atomicNumber, totalElements.get(atomicNumber,
+                        0) + elements.get(atomicNumber) * solution.stoichiometricCoefficient);
+            }
+        }
+        return totalElements;
     }
 }

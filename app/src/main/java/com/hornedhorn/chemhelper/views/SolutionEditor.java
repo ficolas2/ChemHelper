@@ -52,7 +52,7 @@ public class SolutionEditor extends RelativeLayout {
                 ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
                 if ( currentSolutionView == null )
                     return;
-                currentSolutionView.solution.stoichiometricCoefficient = Utils.parseDouble(s.toString());
+                currentSolutionView.solution.stoichiometricCoefficient = s.toString().isEmpty() ? 0:Integer.parseInt(s.toString());
                 reactionFragment.updateSolutionViews();
             }
 

@@ -4,7 +4,7 @@ import com.hornedhorn.chemhelper.data.Units.Amount;
 
 public class ReactionSolution extends Solution {
 
-    public double stoichiometricCoefficient = 1;
+    public int stoichiometricCoefficient = 1;
     public double excess = 0;
 
     public ReactionSolution(Compound compound){

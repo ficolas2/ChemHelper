@@ -33,4 +33,6 @@
         <item>kg/L</item>
         <item>b</item>
     </string-array>
+
+    <string name="balance"><u>Balance</u></string>
 </resources>

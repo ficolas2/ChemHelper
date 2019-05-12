@@ -1,13 +1,18 @@
 package com.hornedhorn.chemhelper.data;
 
 import android.util.Log;
+import android.util.SparseArray;
 
 import com.hornedhorn.chemhelper.Utils;
 import com.hornedhorn.chemhelper.cdk.MolecularFormulaManipulator;
 
+import org.apache.commons.math3.optim.InitialGuess;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openscience.cdk.DefaultChemObjectBuilder;
+import org.openscience.cdk.interfaces.IAtom;
+import org.openscience.cdk.interfaces.IElement;
+import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 
 public class Compound {
@@ -118,6 +123,14 @@ public class Compound {
             e.printStackTrace();
         }
         return object;
+    }
+
+    public SparseArray<Integer> getElements(){
+        SparseArray<Integer> elements = new SparseArray<>();
+        for (IElement element : MolecularFormulaManipulator.elements(formula))
+            elements.put(element.getAtomicNumber(), MolecularFormulaManipulator.getElementCount(formula, element));
+
+        return elements;
     }
 
 }

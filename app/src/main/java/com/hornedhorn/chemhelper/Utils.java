@@ -12,12 +12,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Utils {
 
     private static final int significantDigits = 6;
     private static final Pattern formulaPattern = Pattern.compile("(\\(?([A-Z][a-z]?)[0-9]*\\)?)*");
+    private static final Pattern subscriptPattern = Pattern.compile("(?<=[A-Z]|[a-z])[0-9]+");
 
     public static String formatInputDouble(double value){
         if ( value <= 0 )
@@ -80,20 +82,11 @@ public class Utils {
         return formulaPattern.matcher(str).matches();
     }
 
-    public static boolean isAlphanumberic(char c){
-        return (c >= 'a' && c <= 'z') ||
-                (c >= 'A' && c <= 'Z') ||
-                (c >= '0' && c <= '9');
-    }
-
     public static void addSubscripts(SpannableStringBuilder builder) {
-        for (int i=1; i<builder.length(); i++){
-            char c = builder.charAt(i);
-            char prevC = builder.charAt(i-1);
-            if (Character.isDigit(c) && (isAlphanumberic(prevC) || prevC == ')' ||prevC == ']')){
-                builder.setSpan(new SubscriptSpan(), i, i+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                builder.setSpan(new RelativeSizeSpan(0.65f), i, i+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
+        Matcher m = subscriptPattern.matcher(builder.toString());
+        while (m.find()){
+            builder.setSpan(new SubscriptSpan(), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+            builder.setSpan(new RelativeSizeSpan(0.65f), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
@@ -111,5 +104,20 @@ public class Utils {
             }
         }
         return equivalent;
+    }
+
+    public static int getDenominator(double number) {
+        double num1 = 1; double num2 = 0;
+        double den1 = 0; double den2 = 1;
+        double b = number;
+        do {
+            double a = Math.floor(b);
+            double aux = num1; num1 = a*num1+num2; num2 = aux;
+            aux = den1; den1 = a*den1+den2; den2 = aux;
+            b = 1/(b-a);
+
+        }while (!epsilonEqual(number, num1/den1, 1E-6));
+
+        return (int)Math.round(den1);
     }
 }

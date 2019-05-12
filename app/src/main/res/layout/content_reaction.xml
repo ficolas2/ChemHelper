@@ -25,25 +25,33 @@
                 android:id="@+id/reaction_clear"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
                 android:text="Clear" />
 
             <TextView
                 android:id="@+id/reaction_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
                 android:freezesText="false"
                 android:gravity="center"
                 android:minHeight="30dp"
                 android:textSize="14dp"
                 app:autoSizeStepGranularity="1dp" />
 
+            <TextView
+                android:id="@+id/reaction_balance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/balance"
+                android:visibility="gone" />
+
             <HorizontalScrollView
                 android:id="@+id/reaction_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="125dp"
                 android:layout_gravity="center"
+                android:layout_marginTop="5dp"
                 android:background="@color/backgroundHighlight">
 
                 <LinearLayout
