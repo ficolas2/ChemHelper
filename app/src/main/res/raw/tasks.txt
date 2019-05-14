@@ -1,10 +1,8 @@
 TODO unit tests for ReactionFragment stuff
 TODO order reactionFragment, get logic out of calculate()
-TODO debug info when amount tries to convert without density or molar mass
 
-TODO add densities to compound data, and density graphs
+-----------------------------------------------------------------------------------------------------------------------------
 
-TODO formula verifier for compound creation
 TODO more info in compound creation
 TODO density in compound creation
 
@@ -26,6 +24,7 @@ TODO block mol if concentration is given in anything but pure
 TODO Search suggestions
 
 TODO solubility data, solubility curves
+TODO add densities to compound data, and density graphs
 
 TODO Concentration conversion (Possible with reactions, but not ideal)
 TODO pH calculation

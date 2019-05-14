@@ -1,10 +1,15 @@
 package com.hornedhorn.chemhelper;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SubscriptSpan;
+import android.util.Log;
 
+import com.hornedhorn.chemhelper.data.Element;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
 import com.hornedhorn.chemhelper.data.Units.Amount;
 
@@ -18,7 +23,7 @@ import java.util.regex.Pattern;
 public class Utils {
 
     private static final int significantDigits = 6;
-    private static final Pattern formulaPattern = Pattern.compile("(\\(?([A-Z][a-z]?)[0-9]*\\)?)*");
+    private static final Pattern formulaPattern = Pattern.compile("\\(?([A-Z][a-z]?)[0-9]*\\)?[0-9]*");
     private static final Pattern subscriptPattern = Pattern.compile("(?<=[A-Z]|[a-z])[0-9]+");
 
     public static String formatInputDouble(double value){
@@ -78,15 +83,44 @@ public class Utils {
         return arr;
     }
 
-    public static boolean isFormula(String str){
-        return formulaPattern.matcher(str).matches();
+    public static boolean isFormula(String str, ChemApplication application){
+        if (str.isEmpty())
+            return false;
+        Matcher m = formulaPattern.matcher(str);
+
+        regexLoop:
+        while (m.find()){
+            String symbol = m.group(1);
+            if (symbol.isEmpty())
+                continue;
+
+            for (int i = 0; i<application.elements.size(); i++) {
+                Element element = application.elements.valueAt(i);
+                if (element.molecularFormulaString.equals(symbol))
+                    continue regexLoop;
+            }
+            return false;
+        }
+
+        if (!m.replaceAll("").isEmpty())
+            return false;
+
+        return true;
     }
 
-    public static void addSubscripts(SpannableStringBuilder builder) {
+ /*   public static void addSubscripts(SpannableStringBuilder builder) {
         Matcher m = subscriptPattern.matcher(builder.toString());
         while (m.find()){
             builder.setSpan(new SubscriptSpan(), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             builder.setSpan(new RelativeSizeSpan(0.65f), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+    }*/
+
+    public static void addSubscripts(Editable editable) {
+        Matcher m = subscriptPattern.matcher(editable.toString());
+        while (m.find()){
+                editable.setSpan(new SubscriptSpan(), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                editable.setSpan(new RelativeSizeSpan(0.65f), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
@@ -119,5 +153,13 @@ public class Utils {
         }while (!epsilonEqual(number, num1/den1, 1E-6));
 
         return (int)Math.round(den1);
+    }
+
+    public static void errorBox(String message, Context context){
+        new AlertDialog.Builder(context)
+                .setTitle("Error")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.yes, null)
+                .show();
     }
 }

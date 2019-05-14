@@ -93,6 +93,8 @@ public class CompoundFragment extends Fragment {
     }
 
     public void searchCompound( String str ){
+        if (str == null)
+            return;
         lastSearch = str;
         final ChemApplication application = (ChemApplication) getActivity().getApplication();
         ArrayList<Compound> searchCompounds;
@@ -111,7 +113,7 @@ public class CompoundFragment extends Fragment {
         final ArrayList<Map<CompoundAdapter.CompoundAdapterData, String>> compounds = new ArrayList<>();
 
         String formulaStr = null;
-        if (Utils.isFormula(str)) {
+        if (Utils.isFormula(str, (ChemApplication) getActivity().getApplication())) {
             IMolecularFormula molecularFormula = MolecularFormulaManipulator.getMolecularFormula(str, DefaultChemObjectBuilder.getInstance());
             formulaStr = MolecularFormulaManipulator.getString(molecularFormula);
         }

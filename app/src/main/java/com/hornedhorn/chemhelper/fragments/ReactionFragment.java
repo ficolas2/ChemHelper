@@ -394,28 +394,20 @@ public class ReactionFragment extends CompoundReciverFragment {
         return Utils.parseDouble(yieldView.getText().toString())/100;
     }
 
-    private void errorBox(String message){
-        new AlertDialog.Builder(getContext())
-                .setTitle("Error")
-                .setMessage(message)
-                .setPositiveButton(android.R.string.yes, null)
-                .show();
-    }
-
     private void balance(){
         SparseArray<Integer> reactantElements = getElements(reactants);
         SparseArray<Integer> productElements = getElements(products);
         ArrayList<Integer> atomicNumbers = new ArrayList<>();
 
         if (reactantElements.size() != productElements.size()) {
-            errorBox("Reactants and products don't have the same elements.");
+            Utils.errorBox("Reactants and products don't have the same elements.", getContext());
             return;
         }
 
         for (int i = 0; i<reactantElements.size(); i++){
             int atomicNumber = reactantElements.keyAt(i);
             if (productElements.get(atomicNumber) == null){
-                errorBox("Reactants and products don't have the same elements.");
+                Utils.errorBox("Reactants and products don't have the same elements.", getContext());
                 return;
             }
 
