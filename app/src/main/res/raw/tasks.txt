@@ -4,7 +4,6 @@ TODO order reactionFragment, get logic out of calculate()
 -----------------------------------------------------------------------------------------------------------------------------
 
 TODO more info in compound creation
-TODO density in compound creation
 
 TODO Do something with calculate -> change data -> delete (clear amounts button?), and add coloring for what will get calculated
 
@@ -14,6 +13,7 @@ TODO Ads
 
 -----------------------------------------------------------------------------------------------------------------------------
 
+TODO finish periodic table
 TODO translation
 TODO compound drawing from smiles
 
@@ -25,6 +25,7 @@ TODO Search suggestions
 
 TODO solubility data, solubility curves
 TODO add densities to compound data, and density graphs
+TODO density in compound creation
 
 TODO Concentration conversion (Possible with reactions, but not ideal)
 TODO pH calculation

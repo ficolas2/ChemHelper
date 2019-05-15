@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.hornedhorn.chemhelper.R;
 import com.hornedhorn.chemhelper.Utils;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
+import com.hornedhorn.chemhelper.data.Units.Amount;
 import com.hornedhorn.chemhelper.data.Units.Concentration;
 import com.hornedhorn.chemhelper.fragments.ReactionFragment;
 import com.hornedhorn.chemhelper.utils.InputFilterMinMax;
@@ -116,8 +117,11 @@ public class SolutionEditor extends RelativeLayout {
                 ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
                 if ( currentSolutionView == null )
                     return;
-                currentSolutionView.solution.amount.setUnit((String)amountUnit.getItemAtPosition(position));
-                currentSolutionView.solution.amount.setValue(Utils.parseDouble(amount.getText().toString()));
+                Amount.Unit unit = Amount.Unit.getUnit((String)amountUnit.getItemAtPosition(position));
+                if (currentSolutionView.solution.amount.getUnit().unitType == unit.unitType)
+                    currentSolutionView.solution.amount.setUnit(unit);
+                else
+                    currentSolutionView.solution.amount.setValue(Utils.parseDouble(amount.getText().toString()), unit);
 
                 reactionFragment.updateSolutionViews();
                 updateDensity(currentSolutionView.solution);

@@ -24,6 +24,15 @@ public class Amount {
             this.multiplier = multiplier;
             this.unitType = unitType;
         }
+
+        public static Unit getUnit(String str){
+            for ( Unit unit : Unit.values()) {
+                if (unit.str.equals(str)) {
+                    return unit;
+                }
+            }
+            return null;
+        }
     }
 
     public enum UnitType {
@@ -54,15 +63,6 @@ public class Amount {
         this.unit = unit;
         this.SIValue = value;
     }
-
-    public void setUnit(String str) {
-        for ( Unit unit : Unit.values())
-            if (unit.str.equals(str)) {
-                this.unit = unit;
-                return;
-            }
-    }
-
 
     public double getSI(UnitType wantedUnitType){
         switch (wantedUnitType){
