@@ -69,7 +69,7 @@ public class ReactionFragment extends CompoundReciverFragment {
     private boolean currentSolutionReactant;
 
     private TextView reactionText;
-    private Button reactionSubmit;
+    private Button reactionSubmit, revertCalculation;
 
     private Amount auxAmount = new Amount();
 
@@ -122,6 +122,16 @@ public class ReactionFragment extends CompoundReciverFragment {
             @Override
             public void onClick(View v) {
                 calculate();
+            }
+        });
+
+        revertCalculation = view.findViewById(R.id.reaction_revert);
+        revertCalculation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                for (ReactionSolutionView reactionSolutionView : solutionViews)
+                    reactionSolutionView.revertSolution();
+                updateSolutionViews();
             }
         });
 
@@ -239,8 +249,12 @@ public class ReactionFragment extends CompoundReciverFragment {
     }
 
     public void updateSolutionViews(){
-        for (ReactionSolutionView view : solutionViews)
+        revertCalculation.setVisibility(View.GONE);
+        for (ReactionSolutionView view : solutionViews) {
             view.update();
+            if (view.hasChanged())
+                revertCalculation.setVisibility(View.VISIBLE);
+        }
 
         String error = getError();
 
@@ -294,6 +308,16 @@ public class ReactionFragment extends CompoundReciverFragment {
         else if (reactants.size() == 0)
             return "Add reactants by clicking the left + symbol.";
 
+        String text = "";
+        for (Solution solution : solutions){
+            if (solution.needsDensity() && solution.getDensity() <= 0)
+                text += solution.compound.getName() + " needs density.\n";
+            if (solution.needsPureDensity() && solution.getPureDensity() <= 0)
+                text += solution.compound.getName() + " needs pure density.\n";
+        }
+        if (!text.isEmpty())
+            return text.substring(0, text.length()-1);
+
         double yield = getYield();
 
         double reactantsEquivalent = Utils.getEquivalent(reactants);
@@ -311,7 +335,7 @@ public class ReactionFragment extends CompoundReciverFragment {
                 return "Cannot calculate yield without at least one product and reactant amount.";
 
         if ( productsEquivalent != 0 && reactantsEquivalent != 0  &&
-                !Utils.epsilonEqual(reactantsEquivalent, productsEquivalent / yield, 1./1000)){
+                !Utils.epsilonEqual(reactantsEquivalent, productsEquivalent / yield, 1E-5)){
             return "Your reactants amounts don't match with your products. Tip: leave only one amount.";
         }
 
@@ -319,20 +343,15 @@ public class ReactionFragment extends CompoundReciverFragment {
             return "Not enough data.";
         }
 
-        String text = "";
-        for (Solution solution : solutions){
-            if (solution.needsDensity() && solution.getDensity() <= 0)
-                text += solution.compound.getName() + " needs density.\n";
-            if (solution.needsPureDensity() && solution.getPureDensity() <= 0)
-                text += solution.compound.getName() + " needs pure density.\n";
-        }
-
-        return text.isEmpty() ? null:text;
+        return null;
     }
 
     private void calculate(){
         if (getError() != null)
             return;
+
+        for (ReactionSolutionView solutionView : solutionViews)
+            solutionView.createOldSolution();
 
         double yield = getYield();
 

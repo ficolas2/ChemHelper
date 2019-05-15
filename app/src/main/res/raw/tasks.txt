@@ -3,9 +3,9 @@ TODO order reactionFragment, get logic out of calculate()
 
 -----------------------------------------------------------------------------------------------------------------------------
 
-TODO more info in compound creation
+TODO >1 concentrations
 
-TODO Do something with calculate -> change data -> delete (clear amounts button?), and add coloring for what will get calculated
+TODO more info in compound creation
 
 TODO Jaro–Winkler distance for search (better search)
 

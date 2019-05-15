@@ -36,12 +36,14 @@ public class Amount {
     }
 
     public enum UnitType {
-        MASS(Unit.KILOGRAM), VOLUME(Unit.LITER), MOLE(Unit.MOLE);
+        MASS, VOLUME, MOLE;
 
-        public final Unit SIUnit;
-
-        UnitType(Unit SIUnit){
-            this.SIUnit = SIUnit;
+        public Unit getSIUnit(){
+            for (Unit unit : Unit.values()){
+                if (unit.unitType == this && unit.multiplier == 1)
+                    return unit;
+            }
+            return null;
         }
     }
 

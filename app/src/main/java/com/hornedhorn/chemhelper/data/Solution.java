@@ -8,7 +8,6 @@ public class Solution {
     public static Amount auxAmount = new Amount();
 
     public final Compound compound;
-    public Compound solvent;
 
     public final Amount amount = new Amount();
     public final Concentration concentration = new Concentration();
@@ -17,6 +16,12 @@ public class Solution {
     public Solution(Compound compound){
         this.compound = compound;
         amount.setMolecularMass( compound.getMolecularWeight() );
+    }
+
+    public Solution(Solution solution){
+        this.compound = solution.compound;
+        this.amount.set(solution.amount);
+        this.concentration.set(solution.concentration);
     }
 
     public Amount getSolute(){
@@ -65,4 +70,6 @@ public class Solution {
             return concentration.concentrationUnit.soluteUnit == Amount.UnitType.VOLUME;
         }
     }
+
+
 }

@@ -11,9 +11,16 @@ public class ReactionSolution extends Solution {
         super(compound);
     }
 
+    public ReactionSolution(ReactionSolution reactionSolution){
+        super(reactionSolution);
+        this.stoichiometricCoefficient = reactionSolution.stoichiometricCoefficient;
+        this.excess = reactionSolution.excess;
+    }
+
     public double getEquivalent() {
         if (concentration.concentrationValue <= 0 || amount.getValue() <= 0 )
             return 0;
         return getSolute().getSI(Amount.UnitType.MOLE) / stoichiometricCoefficient / ( 1 + excess/100 );
     }
+
 }

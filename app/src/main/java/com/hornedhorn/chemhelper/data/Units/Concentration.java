@@ -30,19 +30,30 @@ public class Concentration {
             this.str = str;
             this.percent = percent;
         }
+
+        public static ConcentrationUnit getConcentrationUnit(String str) {
+            for (ConcentrationUnit concentrationUnit : ConcentrationUnit.values()){
+                if (concentrationUnit.str.equals(str)) {
+                    return concentrationUnit;
+                }
+            }
+            return null;
+        }
     }
 
     public double concentrationValue = 1;
     public ConcentrationUnit concentrationUnit = ConcentrationUnit.PURE;
 
-    public double pureDensity = 1;
+    public double pureDensity;
 
-    public void setConcentrationUnit(String str) {
-        for (ConcentrationUnit concentrationUnit : ConcentrationUnit.values())
-            if (concentrationUnit.str.equals(str)) {
-                this.concentrationUnit = concentrationUnit;
-                return;
-            }
+    public void set(Concentration concentration) {
+        this.concentrationValue = concentration.concentrationValue;
+        this.concentrationUnit = concentration.concentrationUnit;
+        this.pureDensity = concentration.pureDensity;
+    }
+
+    public void setConcentrationUnit(ConcentrationUnit concentrationUnit) {
+        this.concentrationUnit = concentrationUnit;
     }
 
     public void getSoluteFromSolution(Amount soluteAmount, Amount solutionAmount){
@@ -52,7 +63,7 @@ public class Concentration {
             soluteAmount.setDensity( pureDensity );
             soluteAmount.setFromValue(solutionAmount.getSI(concentrationUnit.solutionUnit) * concentrationValue
                             / (concentrationUnit.percent ? 100.:1),
-                    concentrationUnit.soluteUnit.SIUnit);
+                    concentrationUnit.soluteUnit.getSIUnit());
         }
     }
 
@@ -63,7 +74,7 @@ public class Concentration {
             soluteAmount.setDensity( pureDensity );
             solutionAmount.setFromValue(soluteAmount.getSI(concentrationUnit.soluteUnit) / concentrationValue
                             * (concentrationUnit.percent ? 100.:1),
-                    concentrationUnit.solutionUnit.SIUnit );
+                    concentrationUnit.solutionUnit.getSIUnit() );
         }
     }
 

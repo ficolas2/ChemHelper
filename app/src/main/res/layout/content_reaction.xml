@@ -117,6 +117,13 @@
                 android:enabled="false"
                 android:text="Calculate" />
 
+            <Button
+                android:id="@+id/reaction_revert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Revert calculation"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/reaction_error"
                 android:layout_width="match_parent"

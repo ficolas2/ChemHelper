@@ -54,6 +54,7 @@ public class SolutionEditor extends RelativeLayout {
                 if ( currentSolutionView == null )
                     return;
                 currentSolutionView.solution.stoichiometricCoefficient = s.toString().isEmpty() ? 0:Integer.parseInt(s.toString());
+
                 reactionFragment.updateSolutionViews();
             }
 
@@ -76,6 +77,7 @@ public class SolutionEditor extends RelativeLayout {
                 if ( currentSolutionView == null )
                     return;
                 currentSolutionView.solution.excess = Utils.parseDouble(s.toString());
+
                 reactionFragment.updateSolutionViews();
             }
         });
@@ -87,7 +89,15 @@ public class SolutionEditor extends RelativeLayout {
                 ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
                 if ( currentSolutionView == null )
                     return;
-                currentSolutionView.solution.concentration.concentrationValue = Utils.parseDouble(s.toString());
+                double newConcentration = Utils.parseDouble(s.toString());
+
+                if (currentSolutionView.concentrationChanged() &&
+                        !Utils.epsilonEqual(newConcentration,  currentSolutionView.solution.concentration.concentrationValue, 1E-5))
+                    currentSolutionView.clearOldSolution();
+
+                currentSolutionView.solution.concentration.concentrationValue = newConcentration;
+
+
                 reactionFragment.updateSolutionViews();
             }
 
@@ -102,7 +112,14 @@ public class SolutionEditor extends RelativeLayout {
                 ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
                 if ( currentSolutionView == null  )
                     return;
-                currentSolutionView.solution.amount.setValue( Utils.parseDouble(s.toString()) );
+                double newAmount = Utils.parseDouble(s.toString());
+
+                if (currentSolutionView.amountChanged() &&
+                        !Utils.epsilonEqual(newAmount, currentSolutionView.solution.amount.getValue(), 1E-5))
+                    currentSolutionView.clearOldSolution();
+
+                currentSolutionView.solution.amount.setValue( newAmount );
+
                 reactionFragment.updateSolutionViews();
             }
 
@@ -118,10 +135,16 @@ public class SolutionEditor extends RelativeLayout {
                 if ( currentSolutionView == null )
                     return;
                 Amount.Unit unit = Amount.Unit.getUnit((String)amountUnit.getItemAtPosition(position));
+
+
+
                 if (currentSolutionView.solution.amount.getUnit().unitType == unit.unitType)
                     currentSolutionView.solution.amount.setUnit(unit);
-                else
+                else {
                     currentSolutionView.solution.amount.setValue(Utils.parseDouble(amount.getText().toString()), unit);
+                    if ( currentSolutionView.amountChanged())
+                        currentSolutionView.clearOldSolution();
+                }
 
                 reactionFragment.updateSolutionViews();
                 updateDensity(currentSolutionView.solution);
@@ -137,7 +160,14 @@ public class SolutionEditor extends RelativeLayout {
                 if ( currentSolutionView == null )
                     return;
 
-                currentSolutionView.solution.concentration.setConcentrationUnit((String)concentrationUnit.getItemAtPosition(position));
+                Concentration.ConcentrationUnit unit = Concentration.ConcentrationUnit.getConcentrationUnit(
+                        (String)concentrationUnit.getItemAtPosition(position));
+
+                if ( currentSolutionView.concentrationChanged() && currentSolutionView.solution.concentration.concentrationUnit != unit)
+                    currentSolutionView.clearOldSolution();
+
+                currentSolutionView.solution.concentration.setConcentrationUnit(unit);
+
                 reactionFragment.updateSolutionViews();
 
                 Concentration.ConcentrationUnit concentrationUnit = currentSolutionView.solution.concentration.concentrationUnit;
@@ -165,6 +195,7 @@ public class SolutionEditor extends RelativeLayout {
                 if ( currentSolutionView == null )
                     return;
                 currentSolutionView.solution.setDensity(Utils.parseDouble(s.toString()));
+
                 reactionFragment.updateSolutionViews();
             }
         });
@@ -184,6 +215,7 @@ public class SolutionEditor extends RelativeLayout {
                 if ( currentSolutionView == null )
                     return;
                 currentSolutionView.solution.setPureDensity(Utils.parseDouble(s.toString()));
+
                 reactionFragment.updateSolutionViews();
             }
         });
