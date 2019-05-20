@@ -1,13 +1,14 @@
 TODO unit tests for ReactionFragment stuff
 TODO order reactionFragment, get logic out of calculate()
 
+TODO order formatname stuff
+
 -----------------------------------------------------------------------------------------------------------------------------
 
-TODO >1 concentrations
+TODO >1 concentrations warning (Also for Molar, etc)
+    TODO Recommend using density for this, warning
 
 TODO more info in compound creation
-
-TODO Jaro–Winkler distance for search (better search)
 
 TODO Ads
 
@@ -18,10 +19,11 @@ TODO translation
 TODO compound drawing from smiles
 
 -----------------------------------------------------------------------------------------------------------------------------
+
+TODO Jaro–Winkler distance for search (better search) ???
 TODO equilibrium
 
 TODO block mol if concentration is given in anything but pure
-TODO Search suggestions
 
 TODO solubility data, solubility curves
 TODO add densities to compound data, and density graphs
@@ -31,3 +33,7 @@ TODO Concentration conversion (Possible with reactions, but not ideal)
 TODO pH calculation
 TODO recrystalization helper
 TODO chromatography
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+TODO ION COMPOUNDS <sup>&minus;</sup> stuff

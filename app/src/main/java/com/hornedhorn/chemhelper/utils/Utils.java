@@ -1,21 +1,21 @@
-package com.hornedhorn.chemhelper;
+package com.hornedhorn.chemhelper.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.text.Editable;
 import android.text.Spannable;
-import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SubscriptSpan;
-import android.util.Log;
 
+import com.hornedhorn.chemhelper.ChemApplication;
+import com.hornedhorn.chemhelper.data.Data;
 import com.hornedhorn.chemhelper.data.Element;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
-import com.hornedhorn.chemhelper.data.Units.Amount;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -83,7 +83,7 @@ public class Utils {
         return arr;
     }
 
-    public static boolean isFormula(String str, ChemApplication application){
+    public static boolean isFormula(String str){
         if (str.isEmpty())
             return false;
         Matcher m = formulaPattern.matcher(str);
@@ -94,8 +94,8 @@ public class Utils {
             if (symbol.isEmpty())
                 continue;
 
-            for (int i = 0; i<application.elements.size(); i++) {
-                Element element = application.elements.valueAt(i);
+            for (int i = 0; i< Data.elements.size(); i++) {
+                Element element = Data.elements.valueAt(i);
                 if (element.molecularFormulaString.equals(symbol))
                     continue regexLoop;
             }
@@ -161,5 +161,16 @@ public class Utils {
                 .setMessage(message)
                 .setPositiveButton(android.R.string.yes, null)
                 .show();
+    }
+
+    public static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        String string = s.hasNext() ? s.next() : "";
+        s.close();
+        return string;
+    }
+
+    public static String formatName(String name){
+        return name.toLowerCase().substring(0, 1).toUpperCase()  + name.substring(1).toLowerCase();
     }
 }

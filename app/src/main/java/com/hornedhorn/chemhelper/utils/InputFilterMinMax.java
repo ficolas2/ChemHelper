@@ -3,8 +3,6 @@ package com.hornedhorn.chemhelper.utils;
 import android.text.InputFilter;
 import android.text.Spanned;
 
-import com.hornedhorn.chemhelper.Utils;
-
 public class InputFilterMinMax implements InputFilter {
 
     private double min, max;

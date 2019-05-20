@@ -3,14 +3,13 @@ package com.hornedhorn.chemhelper.views;
 import android.content.Context;
 import android.support.annotation.ColorInt;
 import android.text.SpannableStringBuilder;
-import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.R;
-import com.hornedhorn.chemhelper.Utils;
+import com.hornedhorn.chemhelper.utils.Utils;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
 import com.hornedhorn.chemhelper.fragments.ReactionFragment;
 

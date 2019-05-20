@@ -14,7 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.R;
-import com.hornedhorn.chemhelper.Utils;
+import com.hornedhorn.chemhelper.utils.Utils;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
 import com.hornedhorn.chemhelper.data.Units.Amount;
 import com.hornedhorn.chemhelper.data.Units.Concentration;

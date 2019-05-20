@@ -9,25 +9,22 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.SearchView;
-import android.widget.SimpleAdapter;
 
 import com.hornedhorn.chemhelper.ChemApplication;
 import com.hornedhorn.chemhelper.MainActivity;
 import com.hornedhorn.chemhelper.R;
-import com.hornedhorn.chemhelper.Utils;
+import com.hornedhorn.chemhelper.data.Data;
+import com.hornedhorn.chemhelper.utils.Utils;
 import com.hornedhorn.chemhelper.cdk.MolecularFormulaManipulator;
 import com.hornedhorn.chemhelper.data.Compound;
 import com.hornedhorn.chemhelper.views.CompoundAdapter;
@@ -48,8 +45,7 @@ public class CompoundFragment extends Fragment {
     private CheckBox includedCheckbox, customCheckbox;
     private ListView compoundList;
     private String lastSearch;
-
-    private Compound contextMenuCompound;
+    private SearchView searchView;
 
     @Nullable
     @Override
@@ -57,7 +53,7 @@ public class CompoundFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.content_compound_search, container, false);
 
-        final SearchView searchView = view.findViewById(R.id.compound_search);
+        searchView = view.findViewById(R.id.compound_search);
 
         SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         ComponentName componentName = new ComponentName(getContext(), MainActivity.class);
@@ -96,14 +92,13 @@ public class CompoundFragment extends Fragment {
         if (str == null)
             return;
         lastSearch = str;
-        final ChemApplication application = (ChemApplication) getActivity().getApplication();
         ArrayList<Compound> searchCompounds;
         if (customCheckbox.isChecked() && includedCheckbox.isChecked())
-            searchCompounds = application.allCompounds;
-        else if (!customCheckbox.isChecked() && includedCheckbox.isChecked())
-            searchCompounds = application.includedCompounds;
+            searchCompounds = Data.allCompounds;
         else if (customCheckbox.isChecked() && !includedCheckbox.isChecked())
-            searchCompounds = application.customCompounds;
+            searchCompounds = Data.customCompounds;
+        else if (!customCheckbox.isChecked() && includedCheckbox.isChecked())
+            searchCompounds = Data.includedCompounds;
         else {
             compoundList.setAdapter(null);
             return;
@@ -113,29 +108,25 @@ public class CompoundFragment extends Fragment {
         final ArrayList<Map<CompoundAdapter.CompoundAdapterData, String>> compounds = new ArrayList<>();
 
         String formulaStr = null;
-        if (Utils.isFormula(str, (ChemApplication) getActivity().getApplication())) {
+        if (Utils.isFormula(str)) {
             IMolecularFormula molecularFormula = MolecularFormulaManipulator.getMolecularFormula(str, DefaultChemObjectBuilder.getInstance());
             formulaStr = MolecularFormulaManipulator.getString(molecularFormula);
         }
 
         str = str.toLowerCase();
         for (Compound compound : searchCompounds){
-            String name = compound.name.replace("_", " ").toLowerCase();
-            boolean found = name.contains(str);
+            String containingName = compound.getContainingName(str);
+            boolean found = containingName!=null;
             if (formulaStr != null && compound.sameFormula(formulaStr))
                     found = true;
 
-            if (compound.otherNames != null && !found)
-                for (String otherName : compound.otherNames)
-                    if (otherName.toLowerCase().contains((str)))
-                        found = true;
-
             if (found){
                 Map<CompoundAdapter.CompoundAdapterData, String> compoundMap = new HashMap<>();
-                name = name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
-                compoundMap.put(CompoundAdapter.CompoundAdapterData.NAME, name);
+                compoundMap.put(CompoundAdapter.CompoundAdapterData.NAME, compound.getName());
                 compoundMap.put(CompoundAdapter.CompoundAdapterData.FORMULA, compound.getFormulaString());
                 compoundMap.put(CompoundAdapter.CompoundAdapterData.ID, Integer.toString(compound.id));
+                compoundMap.put(CompoundAdapter.CompoundAdapterData.ORDER,
+                        Integer.toString(containingName == null ? 0:containingName.length()));
                 compounds.add(compoundMap);
             }
         }
@@ -143,8 +134,8 @@ public class CompoundFragment extends Fragment {
         Collections.sort(compounds, new Comparator<Map<CompoundAdapter.CompoundAdapterData, String>>() {
             @Override
             public int compare(Map<CompoundAdapter.CompoundAdapterData, String> o1, Map<CompoundAdapter.CompoundAdapterData, String> o2) {
-                return Integer.signum(o1.get(CompoundAdapter.CompoundAdapterData.NAME).length() -
-                        o2.get(CompoundAdapter.CompoundAdapterData.NAME).length());
+                return Integer.signum(Integer.parseInt(o1.get(CompoundAdapter.CompoundAdapterData.ORDER)) -
+                        Integer.parseInt(o2.get(CompoundAdapter.CompoundAdapterData.ORDER)));
             }
         });
 
@@ -177,8 +168,8 @@ public class CompoundFragment extends Fragment {
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
 
                                     public void onClick(DialogInterface dialog, int whichButton) {
-                                        application.allCompounds.remove(compound);
-                                        application.customCompounds.remove(compound);
+                                        Data.allCompounds.remove(compound);
+                                        Data.customCompounds.remove(compound);
                                         application.saveCompounds();
                                         searchCompound(lastSearch);
                                     }})
@@ -201,5 +192,9 @@ public class CompoundFragment extends Fragment {
             activity.setContentFragment(receiverFragment, true);
         else
             activity.back();
+    }
+
+    public void selectSuggestion(String dataString) {
+        searchView.setQuery(dataString, true);
     }
 }

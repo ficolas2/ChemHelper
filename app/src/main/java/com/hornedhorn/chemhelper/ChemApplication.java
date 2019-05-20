@@ -8,7 +8,9 @@ import android.util.SparseArray;
 
 import com.hornedhorn.chemhelper.R;
 import com.hornedhorn.chemhelper.data.Compound;
+import com.hornedhorn.chemhelper.data.Data;
 import com.hornedhorn.chemhelper.data.Element;
+import com.hornedhorn.chemhelper.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,10 +22,6 @@ import java.util.ArrayList;
 
 public class ChemApplication extends Application {
 
-    public final SparseArray<Element> elements = new SparseArray<>();
-    public final ArrayList<Compound> allCompounds = new ArrayList<>();
-    public final ArrayList<Compound> includedCompounds = new ArrayList<>();
-    public final ArrayList<Compound> customCompounds = new ArrayList<>();
 
     @Override
     public void onCreate() {
@@ -34,13 +32,13 @@ public class ChemApplication extends Application {
         InputStream compoundStream = res.openRawResource(R.raw.compounds);
 
         try{
-            JSONArray compoundJsonArr = new JSONArray(convertStreamToString(compoundStream));
+            JSONArray compoundJsonArr = new JSONArray(Utils.convertStreamToString(compoundStream));
 
             for (int i = 0; i< compoundJsonArr.length(); i++){
                 try{
-                    Compound compound = new Compound( compoundJsonArr.getJSONObject(i), allCompounds.size() );
-                    allCompounds.add(compound);
-                    includedCompounds.add(compound);
+                    Compound compound = new Compound( compoundJsonArr.getJSONObject(i), Data.allCompounds.size() );
+                    Data.allCompounds.add(compound);
+                    Data.includedCompounds.add(compound);
                 }catch(JSONException e)
                 {
                     Log.e("ChemApplication", "Error while reading compound json.");
@@ -54,19 +52,19 @@ public class ChemApplication extends Application {
         InputStream elementStream = res.openRawResource(R.raw.elements);
 
         try{
-            JSONArray elementJsonArr = new JSONArray(convertStreamToString(elementStream));
+            JSONArray elementJsonArr = new JSONArray(Utils.convertStreamToString(elementStream));
 
             for (int i = 0; i< elementJsonArr.length(); i++){
                 try{
-                    Element element = new Element( elementJsonArr.getJSONObject(i), allCompounds.size() );
-                    for (Compound compound : allCompounds)
+                    Element element = new Element( elementJsonArr.getJSONObject(i), Data.allCompounds.size() );
+                    for (Compound compound : Data.allCompounds)
                         if (compound.name.toLowerCase().equals(element.name.toLowerCase())){
                             element.name = element.name + " (Monoatomic)";
                             break;
                         }
-                    elements.put(element.atomicNumber, element);
-                    allCompounds.add(element);
-                    includedCompounds.add(element);
+                    Data.elements.put(element.atomicNumber, element);
+                    Data.allCompounds.add(element);
+                    Data.includedCompounds.add(element);
                 }catch(JSONException e)
                 {
                     Log.e("ChemApplication", "Error while reading element json.");
@@ -79,13 +77,13 @@ public class ChemApplication extends Application {
 
         try{
             FileInputStream inputStream = openFileInput("customCompounds.json");
-            JSONArray jsonArray = new JSONArray(convertStreamToString(inputStream));
+            JSONArray jsonArray = new JSONArray(Utils.convertStreamToString(inputStream));
             inputStream.close();
 
             for (int i=0; i<jsonArray.length(); i++){
-                Compound compound = new Compound(jsonArray.getJSONObject(i), allCompounds.size());
-                customCompounds.add(compound);
-                allCompounds.add(compound);
+                Compound compound = new Compound(jsonArray.getJSONObject(i), Data.allCompounds.size());
+                Data.customCompounds.add(compound);
+                Data.allCompounds.add(compound);
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -93,18 +91,11 @@ public class ChemApplication extends Application {
 
     }
 
-    private String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        String string = s.hasNext() ? s.next() : "";
-        s.close();
-        return string;
-    }
-
     public void saveCompounds(){
 
         JSONArray jsonArray = new JSONArray();
 
-        for (Compound compound : customCompounds)
+        for (Compound compound : Data.customCompounds)
             jsonArray.put(compound.toJSON());
 
         try {
@@ -117,9 +108,9 @@ public class ChemApplication extends Application {
     }
 
     public Compound createCustomCompound() {
-        Compound compound = new Compound(allCompounds.size());
-        customCompounds.add(compound);
-        allCompounds.add(compound);
+        Compound compound = new Compound(Data.allCompounds.size());
+        Data.customCompounds.add(compound);
+        Data.allCompounds.add(compound);
         return compound;
     }
 }

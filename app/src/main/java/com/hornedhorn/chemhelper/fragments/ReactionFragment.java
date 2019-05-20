@@ -3,7 +3,6 @@ package com.hornedhorn.chemhelper.fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
@@ -25,7 +24,7 @@ import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.MainActivity;
 import com.hornedhorn.chemhelper.R;
-import com.hornedhorn.chemhelper.Utils;
+import com.hornedhorn.chemhelper.utils.Utils;
 import com.hornedhorn.chemhelper.data.Compound;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
 import com.hornedhorn.chemhelper.data.Solution;
@@ -41,9 +40,7 @@ import org.apache.commons.math3.linear.QRDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.linear.SingularMatrixException;
-import org.apache.commons.math3.linear.SingularValueDecomposition;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class ReactionFragment extends CompoundReciverFragment {

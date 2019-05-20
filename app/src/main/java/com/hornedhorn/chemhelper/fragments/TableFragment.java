@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.ChemApplication;
 import com.hornedhorn.chemhelper.R;
+import com.hornedhorn.chemhelper.data.Data;
 import com.hornedhorn.chemhelper.data.Element;
 
 public class TableFragment extends Fragment {
@@ -33,7 +34,7 @@ public class TableFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
 
-        SparseArray<Element> elements = ((ChemApplication) getActivity().getApplication()).elements;
+        SparseArray<Element> elements = Data.elements;
         Context context = getContext();
         TableLayout tableLayout = view.findViewById(R.id.periodicTable);
         TableRow row = null;

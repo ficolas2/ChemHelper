@@ -5,7 +5,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.Editable;
-import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +14,7 @@ import android.widget.EditText;
 import com.hornedhorn.chemhelper.ChemApplication;
 import com.hornedhorn.chemhelper.MainActivity;
 import com.hornedhorn.chemhelper.R;
-import com.hornedhorn.chemhelper.Utils;
+import com.hornedhorn.chemhelper.utils.Utils;
 import com.hornedhorn.chemhelper.data.Compound;
 
 public class NewCompoundFragment extends CompoundReciverFragment {
@@ -62,7 +61,7 @@ public class NewCompoundFragment extends CompoundReciverFragment {
                 formula.setSelection(selectionStart);
                 formula.addTextChangedListener(this);
 
-                formula.setTextColor(Utils.isFormula(s.toString(), (ChemApplication) getActivity().getApplication()) ?
+                formula.setTextColor(Utils.isFormula(s.toString()) ?
                         textColor:wrongTextColor);
             }
 
@@ -100,7 +99,7 @@ public class NewCompoundFragment extends CompoundReciverFragment {
             Utils.errorBox("Formula can't be empty.", getContext());
             return;
         }
-        if (!Utils.isFormula(formulaStr, (ChemApplication) getActivity().getApplication())) {
+        if (!Utils.isFormula(formulaStr)) {
             Utils.errorBox("Invalid formula.", getContext());
             return;
         }

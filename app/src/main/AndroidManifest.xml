@@ -28,6 +28,12 @@
         </activity>
         <meta-data android:name="android.app.default_searchable"
             android:value=".MainActivity"/>
+        <provider
+            android:name="com.hornedhorn.chemhelper.CompoundSuggestionProvider"
+            android:authorities="com.hornedhorn.chemhelper.CompoundSuggestionProvider"
+            android:enabled="true"
+            android:exported="false"
+        />
     </application>
 
 </manifest>

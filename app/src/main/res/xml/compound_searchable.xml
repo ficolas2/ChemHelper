@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
     android:label="@string/compound_search_label"
-    android:hint="@string/compound_search_hint" >
+    android:hint="@string/compound_search_hint"
+    android:searchSuggestAuthority="com.hornedhorn.chemhelper.CompoundSuggestionProvider"
+    android:searchSuggestIntentAction="android.intent.action.VIEW"
+    android:includeInGlobalSearch="true">
 </searchable>

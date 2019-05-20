@@ -398,7 +398,7 @@
             "Condy's crystals",
             "Permanganate of potash",
             "Hypermangan",
-            "Potassium manganate(VII)|OtherNames=Potassium permanganate"
+            "Potassium manganate(VII)"
         ],
         "SMILES": "[K+].[O-][Mn](=O)(=O)=O"
     },
@@ -582,7 +582,7 @@
         "Name": "hexadecane",
         "Other names": [
             "Cetane",
-            "Hexadecane|OtherNames=Cetane"
+            "Hexadecane"
         ],
         "SMILES": "CCCCCCCCCCCCCCCC"
     },
@@ -1492,7 +1492,7 @@
             "Molybdic anhydride",
             "Molybdite",
             "Molybdic trioxide",
-            "Molybdenum trioxide|OtherNames=Molybdic anhydride"
+            "Molybdenum trioxide"
         ]
     },
     {
@@ -3849,7 +3849,6 @@
         "Formula": "(CH3)3N",
         "LogP": 0.11900000274181366,
         "Name": "trimethylamine",
-        "Other names": ["(Trimethyl)amine (The name trimethylamine is deprecated.)"],
         "SMILES": "CN(C)C"
     },
     {
@@ -4933,7 +4932,7 @@
         "Name": "Diimide",
         "Other names": [
             "Diimine",
-            "Diazene|SystematicName=&lt;!-- Diazene (substitutive) OR Dihydridodinitrogen(N\u2014N) (additive) -->|OtherNames=Diimide"
+            "Diazene"
         ],
         "SMILES": "N=N"
     },
@@ -5255,7 +5254,6 @@
         "Formula": "BaI2",
         "Melting point": "711",
         "Name": "barium iodide",
-        "Other names": ["anhydrous"],
         "SMILES": "[Ba+2].[I-].[I-]"
     },
     {
@@ -5297,8 +5295,7 @@
         "LogP": 0.6570000052452087,
         "Name": "diethylamine",
         "Other names": [
-            "(Diethyl)amine",
-            "Diethylamine (deprecated)"
+            "(Diethyl)amine"
         ],
         "SMILES": "CCNCC"
     },
@@ -5313,8 +5310,8 @@
         "Other names": [
             "4-Pyridinamine",
             "4-Pyridylamine",
-            "fampridine (International Nonproprietary Name|INN)",
-            "dalfampridine (United States Adopted Name|USAN)"
+            "fampridine",
+            "dalfampridine"
         ],
         "SMILES": "n1ccc(N)cc1"
     },
@@ -5508,7 +5505,7 @@
         "Other names": [
             "Butane-1,4-dicarboxylic acid",
             "Hexane-1,6-dioic acid",
-            "1,4-butanedicarboxylic acid &lt;!-- Merck Index monograph M1420 -->"
+            "1,4-butanedicarboxylic acid"
         ],
         "SMILES": "O=C(O)CCCCC(=O)O"
     },
@@ -5670,11 +5667,7 @@
         "Other names": [
             "Lithium hydroborate",
             "Lithium tetrahydroborate",
-            "Borate(1-)",
-            "tetrahydro-",
-            "lithium",
-            "lithium boranate",
-            "Lithium tetrahydridoborate(1\u2013)"
+            "lithium boranate"
         ],
         "SMILES": "[Li+].[BH4-]"
     },
@@ -6361,7 +6354,7 @@
         "LogP": -0.2800000011920929,
         "Name": "acetic acid",
         "Other names": [
-            "Vinegar (when dilute)",
+            "Vinegar",
             "Hydrogen acetate",
             "Methanecarboxylic acid"
         ],
@@ -7457,7 +7450,6 @@
         "Formula": "Zn(OH)2",
         "Melting point": "125",
         "Name": "zinc hydroxide",
-        "Other names": ["Zinc hydroxide|OtherNames="],
         "SMILES": "[Zn+2].[OH-].[OH-]"
     },
     {
@@ -10695,7 +10687,7 @@
         "Formula": "C2H7NO2",
         "Melting point": "113",
         "Name": "ammonium acetate",
-        "Other names": ["Ammonium ethanoate|OtherNames="],
+        "Other names": ["Ammonium ethanoate"],
         "SMILES": "O=C(O)C.N"
     },
     {
@@ -11866,8 +11858,8 @@
         "LogP": -2.1500000953674316,
         "Name": "phosphoric acid",
         "Other names": [
-            "Phosphoric acid|SystematicName=",
-            "OrthoPhosphoric acid|OtherNames=Phosphoric acid|SystematicName="
+            "Phosphoric acid",
+            "OrthoPhosphoric acid"
         ],
         "SMILES": "OP(=O)(O)O"
     },
@@ -12545,7 +12537,7 @@
         "Name": "silane",
         "Other names": [
             "Monosilane",
-            "Silane|OtherNames=Monosilane"
+            "Silane"
         ],
         "SMILES": "[SiH4]"
     },
@@ -12621,7 +12613,7 @@
             "Massicot",
             "Plumbous oxide",
             "Galena",
-            "Lead(II) oxide|OtherNames=Lead monoxide"
+            "Lead(II) oxide"
         ]
     },
     {

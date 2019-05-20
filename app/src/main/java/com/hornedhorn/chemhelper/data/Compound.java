@@ -3,16 +3,13 @@ package com.hornedhorn.chemhelper.data;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.hornedhorn.chemhelper.Utils;
+import com.hornedhorn.chemhelper.utils.Utils;
 import com.hornedhorn.chemhelper.cdk.MolecularFormulaManipulator;
 
-import org.apache.commons.math3.optim.InitialGuess;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.openscience.cdk.DefaultChemObjectBuilder;
-import org.openscience.cdk.interfaces.IAtom;
 import org.openscience.cdk.interfaces.IElement;
-import org.openscience.cdk.interfaces.IIsotope;
 import org.openscience.cdk.interfaces.IMolecularFormula;
 
 public class Compound {
@@ -102,8 +99,7 @@ public class Compound {
     }
 
     public String getName(){
-        String str = name.replace("_", " ");
-        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+        return Utils.formatName(name);
     }
 
     public boolean sameFormula(IMolecularFormula otherFormula){
@@ -133,4 +129,16 @@ public class Compound {
         return elements;
     }
 
+    public String getContainingName(String searchString) {
+        String shortestName = null;
+        if (name.toLowerCase().contains(searchString.toLowerCase()))
+            shortestName = name;
+        if (otherNames!=null)
+            for (String name : otherNames){
+                if (name.contains(searchString) && (shortestName==null || shortestName.length()>name.length()) )
+                    shortestName = name;
+            }
+
+        return shortestName;
+    }
 }
