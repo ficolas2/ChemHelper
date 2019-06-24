@@ -1,7 +1,6 @@
 package com.hornedhorn.chemhelper.fragments;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,16 +11,15 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.Space;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.TextView;
 
-import com.hornedhorn.chemhelper.ChemApplication;
+import com.hornedhorn.chemhelper.MainActivity;
 import com.hornedhorn.chemhelper.R;
 import com.hornedhorn.chemhelper.data.Data;
 import com.hornedhorn.chemhelper.data.Element;
+import com.hornedhorn.chemhelper.views.ElementView;
 
 public class TableFragment extends Fragment {
 
@@ -40,9 +38,6 @@ public class TableFragment extends Fragment {
         TableRow row = null;
 
         ContextThemeWrapper tableContext = new ContextThemeWrapper(context, R.style.PeriodicTable_TableRow);
-        ContextThemeWrapper atomicNumberContext = new ContextThemeWrapper(context, R.style.PeriodicTable_AtomicNumber);
-        ContextThemeWrapper tableElementContext = new ContextThemeWrapper(context, R.style.PeriodicTable_TableElement);
-        ContextThemeWrapper symbolContext = new ContextThemeWrapper(context, R.style.PeriodicTable_Symbol);
 
         int lastGroup = 0;
         int lastPeriod = 0;
@@ -67,35 +62,62 @@ public class TableFragment extends Fragment {
 
             //Spaces when there are groups in between
             for (int group = lastGroup + 1; group < element.group; group++) {
-                Space space = new Space(context, null, R.style.PeriodicTable_TableSpace);
-                row.addView(space);
+                addSpace(row, context);
             }
             lastGroup = element.group;
 
 
             //Create the element button
-            RelativeLayout relativeLayout = new RelativeLayout(tableElementContext);
-            Resources r = getResources();
-            int colorId = r.getIdentifier( element.category ,"color", context.getPackageName());
-            relativeLayout.setBackgroundColor( r.getColor( colorId ) );
-            row.addView(relativeLayout);
-
-            //Atomic number
-            TextView atomicNumber = new TextView(atomicNumberContext);
-            atomicNumber.setText(Integer.toString(element.atomicNumber));
-            relativeLayout.addView(atomicNumber);
-
-            //Element symbol
-            TextView symbol = new TextView(symbolContext);
-            symbol.setText(element.getFormulaString());
-            relativeLayout.addView(symbol);
+            ElementView elementView = new ElementView(context);
+            elementView.setElement(element);
+            elementView.setActivity((MainActivity) getActivity());
+            row.addView(elementView);
         }
+
+        //Lanthanides
+        row = new TableRow(tableContext);
+        row.setPadding(0, 40, 0, 0);
+        tableLayout.addView(row);
+
+        for (int i=0; i<3; i++)
+            addSpace(row, context);
+
+        for (int i = 58; i <= 71; i++ ){
+            Element element = elements.get(i);
+
+            ElementView elementView = new ElementView(context);
+            elementView.setElement(element);
+            elementView.setActivity((MainActivity) getActivity());
+            row.addView(elementView);
+        }
+
+        //Actinides
+        row = new TableRow(tableContext);
+        tableLayout.addView(row);
+
+        for (int i=0; i<3; i++)
+            addSpace(row, context);
+
+        for (int i = 90; i <= 103; i++ ){
+            Element element = elements.get(i);
+
+            ElementView elementView = new ElementView(context);
+            elementView.setElement(element);
+            elementView.setActivity((MainActivity) getActivity());
+            row.addView(elementView);
+        }
+
+
+    }
+
+    private void addSpace(TableRow row, Context context){
+        Space space = new Space(context, null, R.style.PeriodicTable_TableSpace);
+        row.addView(space);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.content_periodic_table, container, false);
     }
 }

@@ -1,8 +1,6 @@
 TODO unit tests for ReactionFragment stuff
 TODO order reactionFragment, get logic out of calculate()
 
-TODO order formatname stuff
-
 -----------------------------------------------------------------------------------------------------------------------------
 
 TODO >1 concentrations warning (Also for Molar, etc)
@@ -14,9 +12,11 @@ TODO Ads
 
 -----------------------------------------------------------------------------------------------------------------------------
 
-TODO finish periodic table
+TODO element info, and more compound info
 TODO translation
 TODO compound drawing from smiles
+
+TODO horizontal
 
 -----------------------------------------------------------------------------------------------------------------------------
 
@@ -37,3 +37,4 @@ TODO chromatography
 -----------------------------------------------------------------------------------------------------------------------------
 
 TODO ION COMPOUNDS <sup>&minus;</sup> stuff
+TODO order formatname stuff

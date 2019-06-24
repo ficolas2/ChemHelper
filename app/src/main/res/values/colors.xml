@@ -15,7 +15,7 @@
     <color name="actinide">#a8002f</color>
     <color name="noble_gas">#0064a8</color>
     <color name="metalloid">#696d2f</color>
-    <color name="unknown_chemical_properties">#303030</color>
+    <color name="unknown_chemical_properties">#606060</color>
 
     <color name="wrong">#ad0000</color>
     <color name="calculated">#007000</color>

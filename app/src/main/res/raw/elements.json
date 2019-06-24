@@ -565,7 +565,6 @@
     "Formula": "Gd",
     "Atomic number": 64,
     "Atomic weight": 157.25,
-    "Group": -1,
     "Period": 6,
     "Category": "lanthanide"
   },
@@ -582,7 +581,6 @@
     "Formula": "Dy",
     "Atomic number": 66,
     "Atomic weight": 162.5,
-    "Group": -1,
     "Period": 6,
     "Category": "lanthanide"
   },
@@ -591,7 +589,6 @@
     "Formula": "Ho",
     "Atomic number": 67,
     "Atomic weight": 164.93,
-    "Group": -1,
     "Period": 6,
     "Category": "lanthanide"
   },
@@ -608,7 +605,6 @@
     "Formula": "Tm",
     "Atomic number": 69,
     "Atomic weight": 168.93,
-    "Group": -1,
     "Period": 6,
     "Category": "lanthanide"
   },
@@ -625,7 +621,6 @@
     "Formula": "Lu",
     "Atomic number": 71,
     "Atomic weight": 174.97,
-    "Group": 3,
     "Period": 6,
     "Category": "lanthanide"
   },
@@ -804,7 +799,6 @@
     "Formula": "Pa",
     "Atomic number": 91,
     "Atomic weight": 231.04,
-    "Group": -1,
     "Period": 7,
     "Category": "actinide"
   },
@@ -813,7 +807,6 @@
     "Formula": "U",
     "Atomic number": 92,
     "Atomic weight": 238.03,
-    "Group": -1,
     "Period": 7,
     "Category": "actinide"
   },
@@ -830,7 +823,6 @@
     "Formula": "Pu",
     "Atomic number": 94,
     "Atomic weight": -1.0,
-    "Group": -1,
     "Period": 7,
     "Category": "actinide"
   },
@@ -839,7 +831,6 @@
     "Formula": "Am",
     "Atomic number": 95,
     "Atomic weight": -1.0,
-    "Group": 3,
     "Period": 7,
     "Category": "actinide"
   },
@@ -856,7 +847,6 @@
     "Formula": "Bk",
     "Atomic number": 97,
     "Atomic weight": -1.0,
-    "Group": -1,
     "Period": 7,
     "Category": "actinide"
   },
@@ -881,7 +871,6 @@
     "Formula": "Fm",
     "Atomic number": 100,
     "Atomic weight": -1.0,
-    "Group": -1,
     "Period": 7,
     "Category": "actinide"
   },
@@ -906,7 +895,6 @@
     "Formula": "Lr",
     "Atomic number": 103,
     "Atomic weight": -1.0,
-    "Group": 3,
     "Period": 7,
     "Category": "actinide"
   },

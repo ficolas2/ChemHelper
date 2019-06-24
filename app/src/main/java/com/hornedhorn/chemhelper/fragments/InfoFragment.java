@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.R;
 import com.hornedhorn.chemhelper.data.Compound;
+import com.hornedhorn.chemhelper.data.Element;
 
 public class InfoFragment extends CompoundReciverFragment {
 
@@ -30,10 +31,13 @@ public class InfoFragment extends CompoundReciverFragment {
             return;
 
         TextView nameView = view.findViewById(R.id.info_name);
-        nameView.setText(compound.name);
+        nameView.setText(compound.name.substring(0, 1).toUpperCase() + compound.name.substring(1));
 
         TextView formulaView = view.findViewById(R.id.info_formula);
-        formulaView.setText(compound.getFormulaString());
+        String formulaStr = compound.getFormulaString();
+        if (compound instanceof Element)
+            formulaStr += " (" + ((Element) compound).atomicNumber + ")";
+        formulaView.setText(formulaStr);
 
         LinearLayout meltingLayout = view.findViewById(R.id.info_melting);
         meltingLayout.setVisibility(compound.meltingPoint == null ? View.GONE:View.VISIBLE);
