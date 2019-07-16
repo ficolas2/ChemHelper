@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.R;
+import com.hornedhorn.chemhelper.utils.TextUtils;
 import com.hornedhorn.chemhelper.utils.Utils;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
 import com.hornedhorn.chemhelper.fragments.ReactionFragment;
@@ -16,7 +17,6 @@ import com.hornedhorn.chemhelper.fragments.ReactionFragment;
 public class ReactionSolutionView extends RelativeLayout {
 
     public final ReactionSolution solution;
-    private ReactionSolution oldSolution;
     private TextView stoichiometry, formula, name, amount, concentration;
     private LinearLayout background;
 
@@ -57,54 +57,29 @@ public class ReactionSolutionView extends RelativeLayout {
         Utils.addSubscripts(formulaStr);
         formula.setText( formulaStr, TextView.BufferType.SPANNABLE );
 
-        if ( !solution.concentration.isPure())
-            concentration.setText( Utils.formatDisplayDouble(solution.concentration.concentrationValue) + " " +
-                    solution.concentration.concentrationUnit.str + " ");
+        if ( !solution.isPure())
+            concentration.setText( TextUtils.getConcentrationText(solution) );
         else
             concentration.setText("");
-        concentration.setTextColor( concentrationChanged() ? calculatedTextColor : textColor);
+        concentration.setTextColor( solution.isConcentrationCalculated() ? calculatedTextColor : textColor);
 
         name.setText( solution.compound.getName() );
 
-        String amountText = Utils.formatDisplayDouble(solution.amount.getValue()) + " " + solution.amount.getUnit().str;
+        String amountText = TextUtils.getAmountText(solution);
 
         if (solution.excess != 0)
             amountText += " (" + Utils.formatDisplayDouble(solution.excess) + "% excess)";
 
         amount.setText( amountText );
-        amount.setTextColor( amountChanged() ? calculatedTextColor : textColor);
+        amount.setTextColor( solution.isAmountCalculated() ? calculatedTextColor : textColor);
     }
 
     public void clearSelection(){
         background.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
     }
 
-    public void createOldSolution(){
-        oldSolution = new ReactionSolution(solution);
-    }
-
-    public void clearOldSolution(){
-        oldSolution = null;
-    }
-
     public void revertSolution(){
-        if (amountChanged())
-            solution.amount.setValue(0);
-        else if (concentrationChanged())
-            solution.amount.setValue(0);
-        clearOldSolution();
-    }
-
-    public boolean hasChanged(){
-        return amountChanged() || concentrationChanged();
-    }
-
-    public boolean amountChanged(){
-        return oldSolution!=null && oldSolution.amount.getValue() != solution.amount.getValue();
-    }
-
-    public boolean concentrationChanged(){
-        return oldSolution!=null && oldSolution.concentration.concentrationValue != solution.concentration.concentrationValue;
+        solution.revert();
     }
 
 

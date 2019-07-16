@@ -10,6 +10,8 @@ TODO more info in compound creation
 
 TODO Ads
 
+TODO Ca(OH)2 + HCl -> CaCl + H2O balancing crashes
+
 -----------------------------------------------------------------------------------------------------------------------------
 
 TODO element info, and more compound info

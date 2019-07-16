@@ -18,7 +18,7 @@ public class ReactionSolution extends Solution {
     }
 
     public double getEquivalent() {
-        if (concentration.concentrationValue <= 0 || amount.getValue() <= 0 )
+        if ( !hasConcentration() || !hasAmount() )
             return 0;
         return getSolute().getSI(Amount.UnitType.MOLE) / stoichiometricCoefficient / ( 1 + excess/100 );
     }

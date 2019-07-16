@@ -249,7 +249,7 @@ public class ReactionFragment extends CompoundReciverFragment {
         revertCalculation.setVisibility(View.GONE);
         for (ReactionSolutionView view : solutionViews) {
             view.update();
-            if (view.hasChanged())
+            if (view.solution.isCalculated())
                 revertCalculation.setVisibility(View.VISIBLE);
         }
 
@@ -347,9 +347,6 @@ public class ReactionFragment extends CompoundReciverFragment {
         if (getError() != null)
             return;
 
-        for (ReactionSolutionView solutionView : solutionViews)
-            solutionView.createOldSolution();
-
         double yield = getYield();
 
         double reactantsEquivalent = Utils.getEquivalent(reactants);
@@ -383,12 +380,12 @@ public class ReactionFragment extends CompoundReciverFragment {
 
         for (ReactionSolution solution : solutions){
             double moles = equivalent * solution.stoichiometricCoefficient * ( 1 + solution.excess/100 );
-            if (solution.amount.getValue() <= 0) {
-                solution.setSolute(moles, Amount.Unit.MOLE);
-            } else if ( !solution.concentration.isPure() && solution.concentration.concentrationValue <= 0){
+            if ( !solution.hasAmount() ) {
+                solution.setCalculatedSolute(moles, Amount.Unit.MOLE);
+            } else if ( !solution.hasConcentration() ){
                 auxAmount.setValue(moles, Amount.Unit.MOLE); //Solute
                 auxAmount.setMolecularMass( solution.compound.getMolecularWeight() );
-                solution.concentration.setFromSolution(solution.amount, auxAmount);
+                solution.setCalculatedConcentrationFromSolution(solution.getAmount(), auxAmount);
             }
         }
     }
