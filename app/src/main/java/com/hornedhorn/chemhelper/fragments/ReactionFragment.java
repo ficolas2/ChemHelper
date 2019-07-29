@@ -32,6 +32,7 @@ import com.hornedhorn.chemhelper.data.Units.Amount;
 import com.hornedhorn.chemhelper.utils.InputFilterMinMax;
 import com.hornedhorn.chemhelper.views.ReactionSolutionView;
 import com.hornedhorn.chemhelper.views.SolutionEditor;
+import com.hornedhorn.chemhelper.views.SolutionEditorCaller;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.DecompositionSolver;
@@ -43,7 +44,7 @@ import org.apache.commons.math3.linear.SingularMatrixException;
 
 import java.util.ArrayList;
 
-public class ReactionFragment extends CompoundReciverFragment {
+public class ReactionFragment extends CompoundReciverFragment implements SolutionEditorCaller {
 
     boolean receivingReactant;
 
@@ -61,9 +62,6 @@ public class ReactionFragment extends CompoundReciverFragment {
     private LinearLayout productsLayout;
 
     private TextView yieldView, errorText, balanceText;
-
-    private ReactionSolutionView currentSolutionView;
-    private boolean currentSolutionReactant;
 
     private TextView reactionText;
     private Button reactionSubmit, revertCalculation;
@@ -150,7 +148,7 @@ public class ReactionFragment extends CompoundReciverFragment {
                 });
 
         solutionEditor = view.findViewById(R.id.solution_editor);
-        solutionEditor.setReactionFragment( this );
+        solutionEditor.setSolutionEditorCaller( this );
 
         yieldView = view.findViewById(R.id.reaction_yield);
         yieldView.setFilters(new InputFilter[]{new InputFilterMinMax(0, 100)});
@@ -275,7 +273,7 @@ public class ReactionFragment extends CompoundReciverFragment {
 
     @Override
     public void setCompound(Compound compound) {
-        ReactionSolution solution = new ReactionSolution(compound);
+        ReactionSolution solution = new ReactionSolution(compound, receivingReactant);
         solutions.add(solution);
         if (receivingReactant) {
             reactants.add(solution);
@@ -285,9 +283,8 @@ public class ReactionFragment extends CompoundReciverFragment {
     }
 
     public void selectSolution(ReactionSolutionView solutionView){
-        this.currentSolutionView = solutionView;
+        this.solutionEditor.editingSolution = solutionView.solution;
         clearSolutionSelection();
-        solutionEditor.setReactant(reactantViews.contains(solutionView));
         solutionEditor.update(solutionView.solution);
     }
 
@@ -372,8 +369,7 @@ public class ReactionFragment extends CompoundReciverFragment {
 
 
         updateSolutionViews();
-        if ( currentSolutionView != null )
-            solutionEditor.update(currentSolutionView.solution);
+        solutionEditor.update();
     }
 
     private void setEmptyEquivalents(ArrayList<ReactionSolution> solutions, double equivalent){
@@ -390,16 +386,13 @@ public class ReactionFragment extends CompoundReciverFragment {
         }
     }
 
-    public ReactionSolutionView getCurrentSolutionView() {
-        return currentSolutionView;
-    }
-
-    public void deleteCurrentSolution() {
-        solutions.remove(currentSolutionView.solution);
-        products.remove(currentSolutionView.solution);
-        reactants.remove(currentSolutionView.solution);
+    public void deleteEditingSolution() {
+        ReactionSolution solution = (ReactionSolution) solutionEditor.editingSolution;
+        solutions.remove(solution);
+        products.remove(solution);
+        reactants.remove(solution);
         addSolutionViews();
-        currentSolutionView = null;
+        solutionEditor.editingSolution = null;
         solutionEditor.setVisibility(View.GONE);
     }
 
@@ -542,5 +535,10 @@ public class ReactionFragment extends CompoundReciverFragment {
             }
         }
         return totalElements;
+    }
+
+    @Override
+    public void solutionEdited() {
+        updateSolutionViews();
     }
 }

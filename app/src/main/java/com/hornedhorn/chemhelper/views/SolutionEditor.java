@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.hornedhorn.chemhelper.R;
+import com.hornedhorn.chemhelper.data.Solution;
 import com.hornedhorn.chemhelper.utils.Utils;
 import com.hornedhorn.chemhelper.data.ReactionSolution;
 import com.hornedhorn.chemhelper.data.Units.Amount;
@@ -23,7 +24,7 @@ import com.hornedhorn.chemhelper.utils.InputFilterMinMax;
 
 public class SolutionEditor extends RelativeLayout {
 
-    private ReactionFragment reactionFragment;
+    private SolutionEditorCaller solutionEditorCaller;
 
     private final TextView name, formula;
     private final EditText stoichiometry, excess, concentrationEditText, amount, density;
@@ -34,6 +35,8 @@ public class SolutionEditor extends RelativeLayout {
     private final View pureDensityLayout;
 
     private boolean editSolution = true;
+
+    public Solution editingSolution;
 
     public SolutionEditor(Context context) {
         this(context, null);
@@ -52,14 +55,12 @@ public class SolutionEditor extends RelativeLayout {
         stoichiometry = findViewById(R.id.solution_stoichiometry);
         stoichiometry.addTextChangedListener(new TextWatcher() {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!editSolution)
+                if (!editSolution || editingSolution == null || !(editingSolution instanceof ReactionSolution))
                     return;
-                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
-                if ( currentSolutionView == null )
-                    return;
-                currentSolutionView.solution.stoichiometricCoefficient = s.toString().isEmpty() ? 0:Integer.parseInt(s.toString());
 
-                reactionFragment.updateSolutionViews();
+                ((ReactionSolution)editingSolution).stoichiometricCoefficient = s.toString().isEmpty() ? 0:Integer.parseInt(s.toString());
+
+                solutionEditorCaller.solutionEdited();
             }
 
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -77,14 +78,12 @@ public class SolutionEditor extends RelativeLayout {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!editSolution)
+                if (!editSolution || editingSolution == null || !(editingSolution instanceof ReactionSolution) )
                     return;
-                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
-                if ( currentSolutionView == null )
-                    return;
-                currentSolutionView.solution.excess = Utils.parseDouble(s.toString());
 
-                reactionFragment.updateSolutionViews();
+                ((ReactionSolution)editingSolution).excess = Utils.parseDouble(s.toString());
+
+                solutionEditorCaller.solutionEdited();
             }
         });
 
@@ -92,16 +91,14 @@ public class SolutionEditor extends RelativeLayout {
         concentrationEditText = findViewById(R.id.solution_concentration);
         concentrationEditText.addTextChangedListener(new TextWatcher() {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!editSolution)
+                if (!editSolution || editingSolution == null)
                     return;
-                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
-                if ( currentSolutionView == null )
-                    return;
+
                 double newConcentration = Utils.parseDouble(s.toString());
 
-                currentSolutionView.solution.setConcentrationValue( newConcentration );
+                editingSolution.setConcentrationValue( newConcentration );
 
-                reactionFragment.updateSolutionViews();
+                solutionEditorCaller.solutionEdited();
             }
 
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -112,16 +109,14 @@ public class SolutionEditor extends RelativeLayout {
         amount = findViewById(R.id.solution_amount);
         amount.addTextChangedListener(new TextWatcher() {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!editSolution)
+                if (!editSolution || editingSolution == null)
                     return;
-                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
-                if ( currentSolutionView == null  )
-                    return;
+
                 double newAmount = Utils.parseDouble(s.toString());
 
-                currentSolutionView.solution.setAmountValue( newAmount );
+                editingSolution.setAmountValue( newAmount );
 
-                reactionFragment.updateSolutionViews();
+                solutionEditorCaller.solutionEdited();
             }
 
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -132,17 +127,15 @@ public class SolutionEditor extends RelativeLayout {
         amountUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!editSolution)
+                if (!editSolution || editingSolution == null)
                     return;
-                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
-                if ( currentSolutionView == null )
-                    return;
+
                 Amount.Unit unit = Amount.Unit.getUnit((String)amountUnit.getItemAtPosition(position));
 
-                currentSolutionView.solution.setAmountUnit(unit);
+                editingSolution.setAmountUnit(unit);
 
-                reactionFragment.updateSolutionViews();
-                updateDensity(currentSolutionView.solution);
+                solutionEditorCaller.solutionEdited();
+                updateDensity(editingSolution);
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
@@ -151,18 +144,15 @@ public class SolutionEditor extends RelativeLayout {
         concentrationUnit.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!editSolution)
-                    return;
-                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
-                if ( currentSolutionView == null )
+                if (!editSolution || editingSolution == null)
                     return;
 
                 Concentration.ConcentrationUnit unit = Concentration.ConcentrationUnit.getConcentrationUnit(
                         (String)concentrationUnit.getItemAtPosition(position));
 
-                currentSolutionView.solution.setConcentrationUnit(unit);
+                editingSolution.setConcentrationUnit(unit);
 
-                reactionFragment.updateSolutionViews();
+                solutionEditorCaller.solutionEdited();
 
                 concentrationEditText.setVisibility(
                         unit == Concentration.ConcentrationUnit.PURE ?  View.GONE:View.VISIBLE);
@@ -170,7 +160,7 @@ public class SolutionEditor extends RelativeLayout {
                     concentrationEditText.setFilters(new InputFilter[]{new InputFilterMinMax(0, 100)});
                 else
                     concentrationEditText.setFilters(new InputFilter[]{});
-                updateDensity(currentSolutionView.solution);
+                updateDensity(editingSolution);
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
@@ -184,14 +174,11 @@ public class SolutionEditor extends RelativeLayout {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!editSolution)
+                if (!editSolution || editingSolution == null)
                     return;
-                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
-                if ( currentSolutionView == null )
-                    return;
-                currentSolutionView.solution.setDensity(Utils.parseDouble(s.toString()));
+                editingSolution.setDensity(Utils.parseDouble(s.toString()));
 
-                reactionFragment.updateSolutionViews();
+                solutionEditorCaller.solutionEdited();
             }
         });
 
@@ -206,28 +193,30 @@ public class SolutionEditor extends RelativeLayout {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!editSolution)
+                if (!editSolution || editingSolution == null)
                     return;
-                ReactionSolutionView currentSolutionView = reactionFragment.getCurrentSolutionView();
-                if ( currentSolutionView == null )
-                    return;
-                currentSolutionView.solution.setPureDensity(Utils.parseDouble(s.toString()));
+                editingSolution.setPureDensity(Utils.parseDouble(s.toString()));
 
-                reactionFragment.updateSolutionViews();
+                solutionEditorCaller.solutionEdited();
             }
         });
 
         findViewById(R.id.solution_delete).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                reactionFragment.deleteCurrentSolution();
+                solutionEditorCaller.deleteEditingSolution();
             }
         });
 
         pureDensityLayout = findViewById(R.id.solution_pure_density_layout);
     }
 
-    public void update(ReactionSolution solution){
+    public void update(){
+        update(editingSolution);
+    }
+
+    public void update(Solution solution){
+        editingSolution = solution;
         editSolution = false;
         setVisibility(View.VISIBLE);
 
@@ -236,9 +225,16 @@ public class SolutionEditor extends RelativeLayout {
         Utils.addSubscripts(formulaStr);
         formula.setText(formulaStr, TextView.BufferType.SPANNABLE);
 
-        stoichiometry.setText(Utils.formatInputDouble(solution.stoichiometricCoefficient));
+        boolean isReactionSolution = solution instanceof ReactionSolution;
+        if (isReactionSolution){
+            ReactionSolution reactionSolution = (ReactionSolution)solution;
 
-        excess.setText(Utils.formatInputDouble(solution.excess));
+            stoichiometry.setText(Utils.formatInputDouble(reactionSolution.stoichiometricCoefficient));
+            excess.setText(Utils.formatInputDouble(reactionSolution.excess));
+            excessLayout.setVisibility( reactionSolution.isReactant ? VISIBLE:GONE);
+        }
+        stoichiometry.setVisibility(isReactionSolution ? VISIBLE:GONE);
+        excess.setVisibility(isReactionSolution ? VISIBLE:GONE);
 
         concentrationEditText.setVisibility(
                 solution.getConcentration().concentrationUnit == Concentration.ConcentrationUnit.PURE ? View.GONE:View.VISIBLE);
@@ -267,7 +263,7 @@ public class SolutionEditor extends RelativeLayout {
         editSolution = true;
     }
 
-    private void updateDensity(ReactionSolution solution){
+    private void updateDensity(Solution solution){
         pureDensityLayout.setVisibility(solution.needsPureDensity() ? VISIBLE:GONE);
         pureDensity.setText( Utils.formatInputDouble( solution.getPureDensity() ));
 
@@ -275,11 +271,7 @@ public class SolutionEditor extends RelativeLayout {
         density.setText( Utils.formatInputDouble( solution.getDensity() ));
     }
 
-    public void setReactionFragment(ReactionFragment reactionFragment) {
-        this.reactionFragment = reactionFragment;
-    }
-
-    public void setReactant(boolean reactant) {
-        excessLayout.setVisibility(reactant ? VISIBLE:GONE);
+    public void setSolutionEditorCaller(SolutionEditorCaller solutionEditorCaller) {
+        this.solutionEditorCaller = solutionEditorCaller;
     }
 }

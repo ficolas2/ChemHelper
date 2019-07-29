@@ -6,9 +6,11 @@ public class ReactionSolution extends Solution {
 
     public int stoichiometricCoefficient = 1;
     public double excess = 0;
+    public boolean isReactant;
 
-    public ReactionSolution(Compound compound){
+    public ReactionSolution(Compound compound, boolean isReactant){
         super(compound);
+        this.isReactant = isReactant;
     }
 
     public ReactionSolution(ReactionSolution reactionSolution){

@@ -10,7 +10,11 @@ TODO more info in compound creation
 
 TODO Ads
 
-TODO Ca(OH)2 + HCl -> CaCl + H2O balancing crashes
+FIXME Ca(OH)2 + HCl -> CaCl + H2O balancing crashes
+
+FIXME subscript after parenthesis
+FIXME [ ] in formulas
+FIXME formula input is wonky
 
 -----------------------------------------------------------------------------------------------------------------------------
 
@@ -40,3 +44,5 @@ TODO chromatography
 
 TODO ION COMPOUNDS <sup>&minus;</sup> stuff
 TODO order formatname stuff
+
+TODO dragging solutions in reaction editor
